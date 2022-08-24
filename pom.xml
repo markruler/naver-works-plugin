@@ -84,10 +84,34 @@
             <artifactId>workflow-durable-task-step</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- RSA Credential -->
         <dependency>
             <groupId>org.jenkins-ci.plugins</groupId>
             <artifactId>ssh-credentials</artifactId>
         </dependency>
+
+        <!-- JWT -->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
+        <!-- HTTP Client -->
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.1.3</version>
+        </dependency>
+
+        <!-- Java Bean Mapper -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.13.3</version>
+        </dependency>
+
     </dependencies>
 
     <repositories>

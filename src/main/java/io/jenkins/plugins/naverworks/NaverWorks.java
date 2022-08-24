@@ -18,6 +18,8 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import io.jenkins.plugins.naverworks.auth.NaverWorksAuth;
+import io.jenkins.plugins.naverworks.auth.Token;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import org.kohsuke.stapler.AncestorInPath;
@@ -27,6 +29,8 @@ import org.kohsuke.stapler.QueryParameter;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URISyntaxException;
+import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
 
@@ -95,11 +99,21 @@ public class NaverWorks
                 BasicSSHUserPrivateKey.class,
                 run,
                 (DomainRequirement) null);
+
+        assert credential != null;
         List<String> privateKeys = credential.getPrivateKeys();
-        for (String privateKey : privateKeys) {
-            logger.println("Private Key >>> " + privateKey);
+
+        final App app = new App(clientId, clientSecret, serviceAccount, privateKeys.get(0));
+        final NaverWorksAuth auth = new NaverWorksAuth();
+
+        final Token token;
+        try {
+            token = auth.requestNaverWorksToken(app);
+        } catch (URISyntaxException | GeneralSecurityException e) {
+            throw new RuntimeException(e);
         }
 
+        logger.println("Token >>> " + token);
         logger.println("Bot ID >>> " + botId);
         logger.println("Channel ID >>> " + channelId);
     }
