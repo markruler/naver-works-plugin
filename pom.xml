@@ -11,11 +11,12 @@
     </parent>
 
     <groupId>io.jenkins.plugins</groupId>
-    <artifactId>naver-works-plugin</artifactId>
+    <artifactId>naver-works</artifactId>
     <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
     <name>NAVER Works Plugin</name>
     <!--<url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>-->
+    <url>https://github.com/markruler/${project.artifactId}-plugin</url>
     <licenses>
         <license>
             <name>MIT License</name>

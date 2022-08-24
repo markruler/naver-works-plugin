@@ -26,7 +26,8 @@ import io.jenkins.plugins.naverworks.bot.CoverData;
 import io.jenkins.plugins.naverworks.bot.Element;
 import io.jenkins.plugins.naverworks.bot.ListTemplateContent;
 import io.jenkins.plugins.naverworks.bot.ListTemplateMessage;
-import io.jenkins.plugins.naverworks.bot.NaverWorksMessageServiceImpl;
+import io.jenkins.plugins.naverworks.bot.MessageService;
+import io.jenkins.plugins.naverworks.bot.NaverWorksMessageService;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import org.kohsuke.stapler.AncestorInPath;
@@ -130,7 +131,7 @@ public class NaverWorks
         logger.println("Token >>> " + token);
 
         Bot bot = new Bot(botId, channelId);
-        NaverWorksMessageServiceImpl messageService = new NaverWorksMessageServiceImpl();
+        MessageService messageService = new NaverWorksMessageService();
 
         ListTemplateContent content = new ListTemplateContent();
         content.setCoverData(new CoverData(backgroundImageUrl));
