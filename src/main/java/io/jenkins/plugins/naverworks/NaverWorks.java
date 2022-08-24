@@ -1,22 +1,34 @@
 package io.jenkins.plugins.naverworks;
 
+import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractProject;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.security.ACL;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Builder;
 import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
-import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Collections;
+import java.util.List;
 
 public class NaverWorks
         extends Builder
@@ -65,10 +77,10 @@ public class NaverWorks
 
     @Override
     public void perform(
-            Run<?, ?> run,
-            FilePath workspace,
-            EnvVars env,
-            Launcher launcher,
+            @Nonnull Run<?, ?> run,
+            @Nonnull FilePath workspace,
+            @Nonnull EnvVars env,
+            @Nonnull Launcher launcher,
             TaskListener listener)
             throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
@@ -76,15 +88,56 @@ public class NaverWorks
         logger.println("Client ID >>> " + clientId);
         logger.println("Client Secret >>> " + clientSecret);
         logger.println("Service Account >>> " + serviceAccount);
+
         logger.println("Credential ID >>> " + credentialId);
+        BasicSSHUserPrivateKey credential = CredentialsProvider.findCredentialById(
+                credentialId,
+                BasicSSHUserPrivateKey.class,
+                run,
+                (DomainRequirement) null);
+        List<String> privateKeys = credential.getPrivateKeys();
+        for (String privateKey : privateKeys) {
+            logger.println("Private Key >>> " + privateKey);
+        }
+
         logger.println("Bot ID >>> " + botId);
         logger.println("Channel ID >>> " + channelId);
     }
 
-    @Symbol("greet")
     @Extension
-    public static final class DescriptorImpl
-            extends BuildStepDescriptor<Builder> {
+    public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
+
+        @Override
+        public String getDisplayName() {
+            return "NAVER Works";
+        }
+
+        @Override
+        public boolean isApplicable(Class<? extends AbstractProject> aClass) {
+            return true;
+        }
+
+        public ListBoxModel doFillCredentialIdItems(@AncestorInPath Item item) {
+
+            if (item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+                return new StandardListBoxModel();
+            }
+            if (item != null
+                    && !item.hasPermission(Item.EXTENDED_READ) /*implied by Item.CONFIGURE*/
+                    && !item.hasPermission(CredentialsProvider.USE_ITEM)) {
+                return new StandardListBoxModel();
+            }
+
+            return new StandardListBoxModel()
+                    .includeEmptyValue()
+                    .includeMatchingAs(
+                            ACL.SYSTEM,
+                            item,
+                            BasicSSHUserPrivateKey.class,
+                            Collections.emptyList(),
+                            CredentialsMatchers.instanceOf(BasicSSHUserPrivateKey.class)
+                    );
+        }
 
         public FormValidation doCheckClientId(@QueryParameter String value) {
             return isBlank(value, "Client ID is required.");
@@ -115,16 +168,6 @@ public class NaverWorks
                 return FormValidation.error(message);
             }
             return FormValidation.ok();
-        }
-
-        @Override
-        public boolean isApplicable(Class<? extends AbstractProject> aClass) {
-            return true;
-        }
-
-        @Override
-        public String getDisplayName() {
-            return "NAVER Works";
         }
     }
 
