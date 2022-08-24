@@ -13,3 +13,16 @@
 ````
 
 - Access to http://localhost:8080/jenkins/
+
+## Build
+
+```shell
+./mvnw clean install
+# target/naver-works.hpi
+```
+
+## Upload
+
+> Manage Jenkins > Manage Plugins > Advanced > Deploy Plugin
+
+![Deploy Plugin](images/deploy-plugin.png)
