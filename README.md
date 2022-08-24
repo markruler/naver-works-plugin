@@ -8,7 +8,7 @@
 ## Test running
 
 ````shell
-./mvnw hpi:run
+./mvnw clean hpi:run
 # Jenkins is fully up and running
 ````
 
