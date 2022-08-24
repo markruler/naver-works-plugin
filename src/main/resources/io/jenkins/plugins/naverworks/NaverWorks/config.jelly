@@ -14,6 +14,9 @@
         <f:entry field="credentialId" title="Credential ID">
             <c:select/>
         </f:entry>
+        <f:entry field="backgroundImageUrl" title="Background Image URL">
+            <f:textbox/>
+        </f:entry>
     </f:section>
 
     <f:section title="Message">

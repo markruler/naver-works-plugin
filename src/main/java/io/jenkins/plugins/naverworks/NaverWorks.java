@@ -20,10 +20,18 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.naverworks.auth.NaverWorksAuth;
 import io.jenkins.plugins.naverworks.auth.Token;
+import io.jenkins.plugins.naverworks.bot.Action;
+import io.jenkins.plugins.naverworks.bot.Bot;
+import io.jenkins.plugins.naverworks.bot.CoverData;
+import io.jenkins.plugins.naverworks.bot.Element;
+import io.jenkins.plugins.naverworks.bot.ListTemplateContent;
+import io.jenkins.plugins.naverworks.bot.ListTemplateMessage;
+import io.jenkins.plugins.naverworks.bot.NaverWorksMessageServiceImpl;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 import javax.annotation.Nonnull;
@@ -31,6 +39,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,6 +53,7 @@ public class NaverWorks
     private final String credentialId;
     private final String botId;
     private final String channelId;
+    private String backgroundImageUrl;
 
     @DataBoundConstructor
     public NaverWorks(String clientId, String clientSecret, String serviceAccount, String credentialId, String botId, String channelId) {
@@ -79,6 +89,15 @@ public class NaverWorks
         return channelId;
     }
 
+    public String getBackgroundImageUrl() {
+        return backgroundImageUrl;
+    }
+
+    @DataBoundSetter
+    public void setBackgroundImageUrl(String backgroundImageUrl) {
+        this.backgroundImageUrl = backgroundImageUrl;
+    }
+
     @Override
     public void perform(
             @Nonnull Run<?, ?> run,
@@ -89,11 +108,6 @@ public class NaverWorks
             throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
 
-        logger.println("Client ID >>> " + clientId);
-        logger.println("Client Secret >>> " + clientSecret);
-        logger.println("Service Account >>> " + serviceAccount);
-
-        logger.println("Credential ID >>> " + credentialId);
         BasicSSHUserPrivateKey credential = CredentialsProvider.findCredentialById(
                 credentialId,
                 BasicSSHUserPrivateKey.class,
@@ -114,8 +128,30 @@ public class NaverWorks
         }
 
         logger.println("Token >>> " + token);
-        logger.println("Bot ID >>> " + botId);
-        logger.println("Channel ID >>> " + channelId);
+
+        Bot bot = new Bot(botId, channelId);
+        NaverWorksMessageServiceImpl messageService = new NaverWorksMessageServiceImpl();
+
+        ListTemplateContent content = new ListTemplateContent();
+        content.setCoverData(new CoverData(backgroundImageUrl));
+
+        List<Element> elements = new ArrayList<>();
+        Action action = new Action("uri", "more", "https://example.com/");
+        elements.add(new Element("JIRA-KEY", "이슈 제목", action));
+        content.setElements(elements);
+
+        List<Action> nestedActions = new ArrayList<>();
+        nestedActions.add(new Action("uri", "Go to Jenkins", "https://www.jenkins.io/"));
+        List<List<Action>> actions = new ArrayList<>();
+        actions.add(nestedActions);
+        content.setActions(actions);
+
+        final ListTemplateMessage message = new ListTemplateMessage(content);
+        try {
+            messageService.sendMessage(token, bot, message);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Extension
