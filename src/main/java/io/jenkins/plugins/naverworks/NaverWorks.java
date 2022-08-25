@@ -185,7 +185,13 @@ public class NaverWorks
         content.setCoverData(new CoverData(backgroundImageUrl));
 
         List<Element> elements = new ArrayList<>();
+        // TODO: Limit 정책을 각 메시지 형식에서 처리
+        // EXCEEDED_LENGTH_LIMIT_OF_PARAM: Maximum content.elements length is 4
+        final int maxContentElementsLength = 4;
+        int elementCount = 0;
         for (Map<String, String> message : messages) {
+            if (elementCount == maxContentElementsLength) break;
+
             String link = MapUtils.getString(message, "link");
             String title = MapUtils.getString(message, "title");
             String subtitle = MapUtils.getString(message, "subtitle");
@@ -194,7 +200,9 @@ public class NaverWorks
             Element element = new Element(title, subtitle, itemAction);
 
             elements.add(element);
+            elementCount++;
         }
+
         // FIXME: 메시지가 비었다면 Link Message로 BUILD_URL 안내하도록 변경
         if (elements.isEmpty()) {
             Element element = new Element("No Message", null, null);
