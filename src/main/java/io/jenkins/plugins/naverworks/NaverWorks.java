@@ -195,6 +195,11 @@ public class NaverWorks
 
             elements.add(element);
         }
+        // FIXME: 메시지가 비었다면 Link Message로 BUILD_URL 안내하도록 변경
+        if (elements.isEmpty()) {
+            Element element = new Element("No Message", null, null);
+            elements.add(element);
+        }
         content.setElements(elements);
 
         List<Action> contentAction = new ArrayList<>();
