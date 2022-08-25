@@ -190,7 +190,9 @@ public class NaverWorks
         final int maxContentElementsLength = 4;
         int elementCount = 0;
         for (Map<String, String> message : messages) {
-            if (elementCount == maxContentElementsLength) break;
+            if (elementCount == maxContentElementsLength) {
+                break;
+            }
 
             String link = MapUtils.getString(message, "link");
             String title = MapUtils.getString(message, "title");
