@@ -30,6 +30,8 @@ import io.jenkins.plugins.naverworks.bot.MessageService;
 import io.jenkins.plugins.naverworks.bot.NaverWorksMessageService;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
+import org.apache.commons.collections.MapUtils;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -43,6 +45,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class NaverWorks
         extends Builder
@@ -55,15 +58,30 @@ public class NaverWorks
     private final String botId;
     private final String channelId;
     private String backgroundImageUrl;
+    private final List<Map<String, String>> messages;
+    private final String contentActionLabel;
+    private final String contentActionLink;
 
     @DataBoundConstructor
-    public NaverWorks(String clientId, String clientSecret, String serviceAccount, String credentialId, String botId, String channelId) {
+    public NaverWorks(
+            String clientId,
+            String clientSecret,
+            String serviceAccount,
+            String credentialId,
+            String botId,
+            String channelId,
+            List<Map<String, String>> messages,
+            String contentActionLabel,
+            String contentActionLink) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.serviceAccount = serviceAccount;
         this.credentialId = credentialId;
         this.botId = botId;
         this.channelId = channelId;
+        this.messages = messages;
+        this.contentActionLabel = contentActionLabel;
+        this.contentActionLink = contentActionLink;
     }
 
     public String getClientId() {
@@ -99,6 +117,34 @@ public class NaverWorks
         this.backgroundImageUrl = backgroundImageUrl;
     }
 
+    public List<Map<String, String>> getMessages() {
+        return messages;
+    }
+
+    public String getContentActionLabel() {
+        return contentActionLabel;
+    }
+
+    public String getContentActionLink() {
+        return contentActionLink;
+    }
+
+    @Override
+    public String toString() {
+        return "NaverWorks{" +
+                "clientId='" + clientId + '\'' +
+                ", clientSecret='" + clientSecret + '\'' +
+                ", serviceAccount='" + serviceAccount + '\'' +
+                ", credentialId='" + credentialId + '\'' +
+                ", botId='" + botId + '\'' +
+                ", channelId='" + channelId + '\'' +
+                ", backgroundImageUrl='" + backgroundImageUrl + '\'' +
+                ", messages=" + messages +
+                ", contentActionLabel='" + contentActionLabel + '\'' +
+                ", contentActionLink='" + contentActionLink + '\'' +
+                '}';
+    }
+
     @Override
     public void perform(
             @Nonnull Run<?, ?> run,
@@ -114,6 +160,8 @@ public class NaverWorks
                 BasicSSHUserPrivateKey.class,
                 run,
                 (DomainRequirement) null);
+
+        logger.println(this);
 
         assert credential != null;
         List<String> privateKeys = credential.getPrivateKeys();
@@ -137,15 +185,23 @@ public class NaverWorks
         content.setCoverData(new CoverData(backgroundImageUrl));
 
         List<Element> elements = new ArrayList<>();
-        Action action = new Action("uri", "more", "https://example.com/");
-        elements.add(new Element("JIRA-KEY", "이슈 제목", action));
+        for (Map<String, String> message : messages) {
+            String link = MapUtils.getString(message, "link");
+            String title = MapUtils.getString(message, "title");
+            String subtitle = MapUtils.getString(message, "subtitle");
+
+            Action itemAction = new Action("uri", "more", link);
+            Element element = new Element(title, subtitle, itemAction);
+
+            elements.add(element);
+        }
         content.setElements(elements);
 
-        List<Action> nestedActions = new ArrayList<>();
-        nestedActions.add(new Action("uri", "Go to Jenkins", "https://www.jenkins.io/"));
-        List<List<Action>> actions = new ArrayList<>();
-        actions.add(nestedActions);
-        content.setActions(actions);
+        List<Action> contentAction = new ArrayList<>();
+        contentAction.add(new Action("uri", contentActionLabel, contentActionLink));
+        List<List<Action>> contentActions = new ArrayList<>();
+        contentActions.add(contentAction);
+        content.setActions(contentActions);
 
         final ListTemplateMessage message = new ListTemplateMessage(content);
         try {
@@ -155,6 +211,7 @@ public class NaverWorks
         }
     }
 
+    @Symbol("naver")
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 

@@ -26,3 +26,28 @@
 > Manage Jenkins > Manage Plugins > Advanced > Deploy Plugin
 
 ![Deploy Plugin](images/deploy-plugin.png)
+
+## Pipeline
+
+```groovy
+// Jenkinsfile.groovy
+stage('Notification') {
+    List issues = [
+            [link: "http://jira.markruler.com/browse/MARK-4", title: "MARK-4", subtitle: "Jira Issue 1"],
+            [link: "http://jira.markruler.com/browse/MARK-10", title: "MARK-10", subtitle: "Jira Issue 2"]
+    ]
+
+    naver(
+            clientId: '${CLIENT_ID}',
+            clientSecret: '${CLIENT_SECRET}',
+            serviceAccount: '${SERVICE_ACCOUNT}',
+            credentialId: '${CREDENTIAL_ID}',
+            backgroundImageUrl: '${IMAGE_URL}',
+            botId: '${BOT_ID}',
+            channelId: '${CHANNEL_ID}',
+            messages: issues,
+            contentActionLabel: 'Go to Jenkins',
+            contentActionLink: '${env.BUILD_URL}'
+    )
+}
+```
