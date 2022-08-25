@@ -1,2 +1,8 @@
+# https://github.com/apps/release-drafter
+# https://github.com/jenkinsci/.github
 _extends: .github
-tag-template: naver-works-$NEXT_MINOR_VERSION
+#tag-template: naver-works-$NEXT_MINOR_VERSION
+template: |
+  ## What’s Changed
+
+  $CHANGES
