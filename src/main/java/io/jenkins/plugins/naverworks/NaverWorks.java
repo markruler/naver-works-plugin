@@ -28,6 +28,8 @@ import io.jenkins.plugins.naverworks.bot.message.Action;
 import io.jenkins.plugins.naverworks.bot.message.CarouselContent;
 import io.jenkins.plugins.naverworks.bot.message.CarouselMessage;
 import io.jenkins.plugins.naverworks.bot.message.CoverData;
+import io.jenkins.plugins.naverworks.bot.message.LinkContent;
+import io.jenkins.plugins.naverworks.bot.message.LinkMessage;
 import io.jenkins.plugins.naverworks.bot.message.ListTemplateContent;
 import io.jenkins.plugins.naverworks.bot.message.ListTemplateMessage;
 import io.jenkins.plugins.naverworks.bot.message.Message;
@@ -180,20 +182,24 @@ public class NaverWorks
         MessageService messageService = new NaverWorksMessageService();
 
         Message message = null;
-        // if (messages == null) {
-        //     // FIXME: 메시지가 비었다면 Link Message로 BUILD_URL 안내하도록 변경
-        // }
+        final int maxListTemplateElements = 4;
 
-        if (messages == null || messages.size() < 4) {
+        if (messages == null || messages.isEmpty()) {
+            LinkContent content = new LinkContent(
+                    "Changes have been deployed.",
+                    contentActionLabel,
+                    contentActionLink
+            );
+            message = new LinkMessage(content);
+        } else if (messages.size() <= maxListTemplateElements) {
             ListTemplateContent content = new ListTemplateContent();
             content.setCoverData(new CoverData(backgroundImageUrl));
             content.setMessages(messages);
-            content.setActions(Collections.singletonList(new Action("uri", contentActionLabel, contentActionLink)));
+            Action action = new Action("uri", contentActionLabel, contentActionLink);
+            content.setActions(Collections.singletonList(action));
 
             message = new ListTemplateMessage(content);
-        }
-
-        if (messages != null && messages.size() > 4) {
+        } else if (maxListTemplateElements < messages.size()) {
             CarouselContent content = new CarouselContent();
             content.setMessages(messages);
             message = new CarouselMessage(content);
