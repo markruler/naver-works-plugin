@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ListTemplateContent implements Content {
-    private final String type = "list_template";
+    private static final String type = "list_template";
     private CoverData coverData;
     private List<Element> elements;
     private List<List<Action>> actions;
@@ -51,11 +51,6 @@ public class ListTemplateContent implements Content {
 
             elementList.add(element);
             elementCount++;
-        }
-        // FIXME: 메시지가 비었다면 Link Message로 BUILD_URL 안내하도록 변경
-        if (elementList.isEmpty()) {
-            Element element = new Element("No Message", null, null);
-            elementList.add(element);
         }
 
         this.setElements(elementList);
