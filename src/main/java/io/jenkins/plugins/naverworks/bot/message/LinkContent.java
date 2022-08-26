@@ -4,7 +4,7 @@ public class LinkContent implements Content {
     /**
      * 메시지 유형
      */
-    private final String type = "link";
+    private static final String type = "link";
 
     /**
      * 메시지 본문

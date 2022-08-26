@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CarouselContent implements Content {
-    private final String type = "carousel";
+    private static final String type = "carousel";
     private String imageAspectRatio;
     private String imageSize;
     private List<Column> columns;
