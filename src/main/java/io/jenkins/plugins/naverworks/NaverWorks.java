@@ -5,6 +5,7 @@ import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
@@ -37,7 +38,6 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
@@ -147,10 +147,10 @@ public class NaverWorks
 
     @Override
     public void perform(
-            @Nonnull Run<?, ?> run,
-            @Nonnull FilePath workspace,
-            @Nonnull EnvVars env,
-            @Nonnull Launcher launcher,
+            @NonNull Run<?, ?> run,
+            @NonNull FilePath workspace,
+            @NonNull EnvVars env,
+            @NonNull Launcher launcher,
             TaskListener listener)
             throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
@@ -230,7 +230,7 @@ public class NaverWorks
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "NAVER Works";
