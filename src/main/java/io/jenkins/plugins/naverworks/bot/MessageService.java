@@ -1,6 +1,7 @@
 package io.jenkins.plugins.naverworks.bot;
 
 import io.jenkins.plugins.naverworks.auth.Token;
+import io.jenkins.plugins.naverworks.bot.message.Message;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
