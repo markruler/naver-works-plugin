@@ -199,7 +199,7 @@ public class NaverWorks
             content.setActions(Collections.singletonList(action));
 
             message = new ListTemplateMessage(content);
-        } else if (maxListTemplateElements < messages.size()) {
+        } else {
             CarouselContent content = new CarouselContent();
             content.setMessages(messages);
             message = new CarouselMessage(content);
@@ -214,6 +214,7 @@ public class NaverWorks
 
     @Symbol("naver")
     @Extension
+    @SuppressWarnings("unused")
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
         @NonNull
