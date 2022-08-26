@@ -86,7 +86,12 @@ public class NaverWorksAuth {
                         throw new ClientProtocolException(ex);
                     }
                 } else {
-                    throw new ClientProtocolException("Unexpected response status: " + status);
+                    throw new ClientProtocolException(
+                            String.format(
+                                    "Unexpected response status - %d:%s",
+                                    status,
+                                    EntityUtils.toString(response.getEntity())
+                            ));
                 }
             };
 
@@ -104,9 +109,8 @@ public class NaverWorksAuth {
      *
      * @return JWT
      * @throws GeneralSecurityException
-     * @throws IOException
      */
-    public String generateJwtWithServiceAccount(App app) throws GeneralSecurityException, IOException {
+    public String generateJwtWithServiceAccount(App app) throws GeneralSecurityException {
 
         Map<String, Object> headers = new HashMap<>();
         headers.put("alg", "RS256");

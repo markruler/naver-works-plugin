@@ -1,4 +1,4 @@
-package io.jenkins.plugins.naverworks.bot;
+package io.jenkins.plugins.naverworks.bot.message;
 
 /**
  * 공통 메시지

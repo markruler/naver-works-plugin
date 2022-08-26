@@ -21,17 +21,18 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.naverworks.auth.NaverWorksAuth;
 import io.jenkins.plugins.naverworks.auth.Token;
-import io.jenkins.plugins.naverworks.bot.Action;
 import io.jenkins.plugins.naverworks.bot.Bot;
-import io.jenkins.plugins.naverworks.bot.CoverData;
-import io.jenkins.plugins.naverworks.bot.Element;
-import io.jenkins.plugins.naverworks.bot.ListTemplateContent;
-import io.jenkins.plugins.naverworks.bot.ListTemplateMessage;
 import io.jenkins.plugins.naverworks.bot.MessageService;
 import io.jenkins.plugins.naverworks.bot.NaverWorksMessageService;
+import io.jenkins.plugins.naverworks.bot.message.Action;
+import io.jenkins.plugins.naverworks.bot.message.CarouselContent;
+import io.jenkins.plugins.naverworks.bot.message.CarouselMessage;
+import io.jenkins.plugins.naverworks.bot.message.CoverData;
+import io.jenkins.plugins.naverworks.bot.message.ListTemplateContent;
+import io.jenkins.plugins.naverworks.bot.message.ListTemplateMessage;
+import io.jenkins.plugins.naverworks.bot.message.Message;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
-import org.apache.commons.collections.MapUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -42,7 +43,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -176,49 +176,29 @@ public class NaverWorks
             throw new RuntimeException(e);
         }
 
-        logger.println("Token >>> " + token);
-
         Bot bot = new Bot(botId, channelId);
         MessageService messageService = new NaverWorksMessageService();
 
-        ListTemplateContent content = new ListTemplateContent();
-        content.setCoverData(new CoverData(backgroundImageUrl));
+        Message message = null;
+        // if (messages == null) {
+        //     // FIXME: 메시지가 비었다면 Link Message로 BUILD_URL 안내하도록 변경
+        // }
 
-        List<Element> elements = new ArrayList<>();
-        // TODO: Limit 정책을 각 메시지 형식에서 처리
-        // EXCEEDED_LENGTH_LIMIT_OF_PARAM: Maximum content.elements length is 4
-        final int maxContentElementsLength = 4;
-        int elementCount = 0;
-        for (Map<String, String> message : messages) {
-            if (elementCount == maxContentElementsLength) {
-                break;
-            }
+        if (messages == null || messages.size() < 4) {
+            ListTemplateContent content = new ListTemplateContent();
+            content.setCoverData(new CoverData(backgroundImageUrl));
+            content.setMessages(messages);
+            content.setActions(Collections.singletonList(new Action("uri", contentActionLabel, contentActionLink)));
 
-            String link = MapUtils.getString(message, "link");
-            String title = MapUtils.getString(message, "title");
-            String subtitle = MapUtils.getString(message, "subtitle");
-
-            Action itemAction = new Action("uri", "more", link);
-            Element element = new Element(title, subtitle, itemAction);
-
-            elements.add(element);
-            elementCount++;
+            message = new ListTemplateMessage(content);
         }
 
-        // FIXME: 메시지가 비었다면 Link Message로 BUILD_URL 안내하도록 변경
-        if (elements.isEmpty()) {
-            Element element = new Element("No Message", null, null);
-            elements.add(element);
+        if (messages != null && messages.size() > 4) {
+            CarouselContent content = new CarouselContent();
+            content.setMessages(messages);
+            message = new CarouselMessage(content);
         }
-        content.setElements(elements);
 
-        List<Action> contentAction = new ArrayList<>();
-        contentAction.add(new Action("uri", contentActionLabel, contentActionLink));
-        List<List<Action>> contentActions = new ArrayList<>();
-        contentActions.add(contentAction);
-        content.setActions(contentActions);
-
-        final ListTemplateMessage message = new ListTemplateMessage(content);
         try {
             messageService.sendMessage(token, bot, message);
         } catch (URISyntaxException e) {

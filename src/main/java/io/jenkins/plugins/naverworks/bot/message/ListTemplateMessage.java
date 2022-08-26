@@ -1,4 +1,4 @@
-package io.jenkins.plugins.naverworks.bot;
+package io.jenkins.plugins.naverworks.bot.message;
 
 /**
  * Message - List Template
@@ -9,7 +9,7 @@ public class ListTemplateMessage implements Message {
 
     private final Content content;
 
-    public ListTemplateMessage(ListTemplateContent content) {
+    public ListTemplateMessage(Content content) {
         this.content = content;
     }
 

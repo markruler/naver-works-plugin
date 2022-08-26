@@ -2,6 +2,7 @@ package io.jenkins.plugins.naverworks.bot;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jenkins.plugins.naverworks.auth.Token;
+import io.jenkins.plugins.naverworks.bot.message.Message;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -57,7 +58,13 @@ public class NaverWorksMessageService implements MessageService {
                         throw new ClientProtocolException(ex);
                     }
                 } else {
-                    throw new ClientProtocolException("Unexpected response status: " + status);
+                    throw new ClientProtocolException(
+                            String.format(
+                                    "Unexpected response status - %d:%s",
+                                    status,
+                                    EntityUtils.toString(response.getEntity())
+                            )
+                    );
                 }
             };
             return httpClient.execute(httpRequest, responseHandler);
