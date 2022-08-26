@@ -97,10 +97,7 @@ public class NaverWorksAuth {
 
             String httpResponse = httpClient.execute(httpRequest, responseHandler);
             ObjectMapper objectMapper = new ObjectMapper();
-            Token token = objectMapper.readValue(httpResponse, Token.class);
-            log.info("Token: {}", token);
-
-            return token;
+            return objectMapper.readValue(httpResponse, Token.class);
         }
     }
 
