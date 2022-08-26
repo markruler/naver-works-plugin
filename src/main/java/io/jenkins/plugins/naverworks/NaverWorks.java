@@ -230,6 +230,7 @@ public class NaverWorks
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
+        @Nonnull
         @Override
         public String getDisplayName() {
             return "NAVER Works";

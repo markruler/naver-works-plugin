@@ -33,24 +33,28 @@
 // Jenkinsfile.groovy
 stage('Notification') {
     List issues = [
-            [link: "http://jira.markruler.com/browse/MARK-4", title: "MARK-4", subtitle: "Jira Issue 1"],
-            [link: "http://jira.markruler.com/browse/MARK-10", title: "MARK-10", subtitle: "Jira Issue 2"]
+            [link: "https://jira.markruler.com/browse/MARK-31", title: "MARK-31", subtitle: "Jira Issue 31"],
+            [link: "https://jira.markruler.com/browse/MARK-32", title: "MARK-32", subtitle: "Jira Issue 32"]
     ]
 
     naver(
-            clientId: '${CLIENT_ID}',
-            clientSecret: '${CLIENT_SECRET}',
-            serviceAccount: '${SERVICE_ACCOUNT}',
-            credentialId: '${CREDENTIAL_ID}',
-            backgroundImageUrl: '${IMAGE_URL}',
-            botId: '${BOT_ID}',
-            channelId: '${CHANNEL_ID}',
+            clientId: env.NAVER_WORKS_CLIENT_ID,
+            clientSecret: env.NAVER_WORKS_CLIENT_SECRET,
+            serviceAccount: env.NAVER_WORKS_SERVICE_ACCOUNT,
+            credentialId: env.NAVER_WORKS_CREDENTIAL_ID,
+            backgroundImageUrl: env.NAVER_WORKS_BG_URL,
+            botId: env.NAVER_WORKS_BOT_ID,
+            channelId: env.NAVER_WORKS_CHANNEL_ID,
             messages: issues,
             contentActionLabel: 'Go to Jenkins',
             contentActionLink: env.BUILD_URL
     )
 }
 ```
+
+![List Template](images/list-template-content.png)
+
+_NAVER Works 메시지_
 
 `Manage Jenkins > Configure System > Jenkins Location > Jenkins URL`
 구성은 별도로 설정하지 않았다면 기본적으로 `localhost`로 설정된다.
