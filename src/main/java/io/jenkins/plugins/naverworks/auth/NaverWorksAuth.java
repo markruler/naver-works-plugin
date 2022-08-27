@@ -17,8 +17,6 @@ import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -41,7 +39,7 @@ import java.util.Map;
  */
 public class NaverWorksAuth {
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
+    public static final String AUTH_API = "https://auth.worksmobile.com/oauth2/v2.0/token";
 
     /**
      * 서비스 어카운트를 통해 토큰을 요청한다.
@@ -68,7 +66,7 @@ public class NaverWorksAuth {
         params.add(new BasicNameValuePair("scope", "bot"));
 
         try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            URI uri = new URI("https://auth.worksmobile.com/oauth2/v2.0/token");
+            URI uri = new URI(AUTH_API);
             HttpPost httpRequest = new HttpPost(uri);
             httpRequest.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
             httpRequest.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));

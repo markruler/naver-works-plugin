@@ -39,11 +39,13 @@ public class NaverWorksMessageService implements MessageService {
 
     private static final String APPLICATION_JSON = "application/json";
 
+    public static final String BOT_API = "https://www.worksapis.com/v1.0/bots";
+
     public String send(final Token token, final Bot bot, final Message message)
             throws URISyntaxException, IOException {
 
         try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            URI uri = new URI(String.format("https://www.worksapis.com/v1.0/bots/%s/channels/%s/messages", bot.getId(), bot.getChannelId()));
+            URI uri = new URI(String.format("%s/%s/channels/%s/messages", BOT_API, bot.getId(), bot.getChannelId()));
 
             HttpPost httpRequest = new HttpPost(uri);
             httpRequest.addHeader("Authorization", "Bearer " + token.getAccessToken());
