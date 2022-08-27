@@ -24,14 +24,6 @@ import io.jenkins.plugins.naverworks.auth.Token;
 import io.jenkins.plugins.naverworks.bot.Bot;
 import io.jenkins.plugins.naverworks.bot.MessageService;
 import io.jenkins.plugins.naverworks.bot.NaverWorksMessageService;
-import io.jenkins.plugins.naverworks.bot.message.Action;
-import io.jenkins.plugins.naverworks.bot.message.CarouselContent;
-import io.jenkins.plugins.naverworks.bot.message.CarouselMessage;
-import io.jenkins.plugins.naverworks.bot.message.CoverData;
-import io.jenkins.plugins.naverworks.bot.message.LinkContent;
-import io.jenkins.plugins.naverworks.bot.message.LinkMessage;
-import io.jenkins.plugins.naverworks.bot.message.ListTemplateContent;
-import io.jenkins.plugins.naverworks.bot.message.ListTemplateMessage;
 import io.jenkins.plugins.naverworks.bot.message.Message;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
@@ -181,32 +173,16 @@ public class NaverWorks
         Bot bot = new Bot(botId, channelId);
         MessageService messageService = new NaverWorksMessageService();
 
-        Message message = null;
-        final int maxListTemplateElements = 4;
-
-        if (messages == null || messages.isEmpty()) {
-            LinkContent content = new LinkContent(
-                    "Changes have been deployed.",
-                    contentActionLabel,
-                    contentActionLink
-            );
-            message = new LinkMessage(content);
-        } else if (messages.size() <= maxListTemplateElements) {
-            ListTemplateContent content = new ListTemplateContent();
-            content.setCoverData(new CoverData(backgroundImageUrl));
-            content.setMessages(messages);
-            Action action = new Action("uri", contentActionLabel, contentActionLink);
-            content.setActions(Collections.singletonList(action));
-
-            message = new ListTemplateMessage(content);
-        } else {
-            CarouselContent content = new CarouselContent();
-            content.setMessages(messages);
-            message = new CarouselMessage(content);
-        }
+        final Message message = messageService.write(
+                messages,
+                backgroundImageUrl,
+                contentActionLabel,
+                contentActionLink
+        );
 
         try {
-            messageService.sendMessage(token, bot, message);
+            String response = messageService.send(token, bot, message);
+            logger.println(response);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
