@@ -5,17 +5,11 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jenkins.plugins.naverworks.App;
 import org.apache.commons.lang.time.DateUtils;
-import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.core5.http.ParseException;
-import org.apache.hc.core5.http.io.HttpClientResponseHandler;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 
 import java.io.IOException;
@@ -71,30 +65,8 @@ public class NaverWorksAuth {
             httpRequest.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
             httpRequest.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
 
-            final HttpClientResponseHandler<String> responseHandler = response -> {
-                final int status = response.getCode();
-                if (status >= HttpStatus.SC_SUCCESS && status < HttpStatus.SC_REDIRECTION) {
-                    final HttpEntity entity = response.getEntity();
-                    try {
-                        if (entity != null) {
-                            return EntityUtils.toString(entity);
-                        }
-                        return null;
-                    } catch (final ParseException ex) {
-                        throw new ClientProtocolException(ex);
-                    }
-                } else {
-                    throw new ClientProtocolException(
-                            String.format(
-                                    "Unexpected response status - %d:%s",
-                                    status,
-                                    EntityUtils.toString(response.getEntity())
-                            ));
-                }
-            };
-
-            String httpResponse = httpClient.execute(httpRequest, responseHandler);
-            ObjectMapper objectMapper = new ObjectMapper();
+            String httpResponse = httpClient.execute(httpRequest, new NaverWorksResponseHandler());
+            final ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.readValue(httpResponse, Token.class);
         }
     }
@@ -105,7 +77,8 @@ public class NaverWorksAuth {
      * @return JWT
      * @throws GeneralSecurityException
      */
-    public String generateJwtWithServiceAccount(App app) throws GeneralSecurityException {
+    public String generateJwtWithServiceAccount(App app)
+            throws GeneralSecurityException {
 
         Map<String, Object> headers = new HashMap<>();
         headers.put("alg", "RS256");

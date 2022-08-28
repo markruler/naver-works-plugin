@@ -53,15 +53,4 @@ public class Token {
     public void setExpiresIn(int expiresIn) {
         this.expiresIn = expiresIn;
     }
-
-    @Override
-    public String toString() {
-        return "Token{" +
-                "accessToken='" + accessToken + '\'' +
-                ", refreshToken='" + refreshToken + '\'' +
-                ", scope='" + scope + '\'' +
-                ", tokenType='" + tokenType + '\'' +
-                ", expiresIn=" + expiresIn +
-                '}';
-    }
 }

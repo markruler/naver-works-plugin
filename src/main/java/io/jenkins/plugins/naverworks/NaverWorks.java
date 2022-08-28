@@ -25,6 +25,7 @@ import io.jenkins.plugins.naverworks.bot.Bot;
 import io.jenkins.plugins.naverworks.bot.MessageService;
 import io.jenkins.plugins.naverworks.bot.NaverWorksMessageService;
 import io.jenkins.plugins.naverworks.bot.message.Message;
+import io.jenkins.plugins.naverworks.exception.RuntimeExceptionWrapper;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 import org.jenkinsci.Symbol;
@@ -167,7 +168,7 @@ public class NaverWorks
         try {
             token = auth.requestNaverWorksToken(app);
         } catch (URISyntaxException | GeneralSecurityException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeExceptionWrapper(e);
         }
 
         Bot bot = new Bot(botId, channelId);
@@ -184,7 +185,7 @@ public class NaverWorks
             String response = messageService.send(token, bot, message);
             logger.println(response);
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeExceptionWrapper(e);
         }
     }
 
