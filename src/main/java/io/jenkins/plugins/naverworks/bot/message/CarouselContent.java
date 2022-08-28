@@ -42,7 +42,11 @@ public class CarouselContent implements Content {
         this.columns = columns;
     }
 
-    public void setMessages(List<Map<String, String>> messages) {
+    public void setMessages(
+            List<Map<String, String>> messages,
+            String backgroundImageUrl,
+            String contentActionLink
+    ) {
         List<Column> columnList = new ArrayList<>();
         // EXCEEDED_LENGTH_LIMIT_OF_PARAM: Maximum content.columns length is 10
         final int maxContentColumnsLength = 10;
@@ -56,11 +60,11 @@ public class CarouselContent implements Content {
             String subtitle = MapUtils.getString(message, "subtitle");
 
             Column column = new Column(
-                    null,
+                    backgroundImageUrl,
                     null,
                     title,
                     subtitle,
-                    null,
+                    new Action("uri", null, contentActionLink),
                     Collections.singletonList(new Action("uri", "more", link))
             );
 

@@ -90,7 +90,7 @@ public class NaverWorksMessageService implements MessageService {
             message = new ListTemplateMessage(content);
         } else {
             CarouselContent content = new CarouselContent();
-            content.setMessages(messages);
+            content.setMessages(messages, backgroundImageUrl, contentActionLink);
             message = new CarouselMessage(content);
         }
         return message;
