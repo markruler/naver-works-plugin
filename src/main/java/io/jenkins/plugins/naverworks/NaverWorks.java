@@ -126,17 +126,11 @@ public class NaverWorks
 
     @Override
     public String toString() {
-        return "NaverWorks{" +
-                "clientId='" + clientId + '\'' +
-                ", clientSecret='" + clientSecret + '\'' +
-                ", serviceAccount='" + serviceAccount + '\'' +
-                ", credentialId='" + credentialId + '\'' +
-                ", botId='" + botId + '\'' +
-                ", channelId='" + channelId + '\'' +
-                ", backgroundImageUrl='" + backgroundImageUrl + '\'' +
+        return "NAVER Works{" +
+                "backgroundImageUrl='" + backgroundImageUrl +
                 ", messages=" + messages +
-                ", contentActionLabel='" + contentActionLabel + '\'' +
-                ", contentActionLink='" + contentActionLink + '\'' +
+                ", contentActionLabel='" + contentActionLabel +
+                ", contentActionLink='" + contentActionLink +
                 '}';
     }
 
@@ -158,22 +152,21 @@ public class NaverWorks
 
         logger.println(this);
 
-        assert credential != null;
-        List<String> privateKeys = credential.getPrivateKeys();
-
-        final App app = new App(clientId, clientSecret, serviceAccount, privateKeys.get(0));
-        final NaverWorksAuth auth = new NaverWorksAuth();
-
         final Token token;
         try {
+            logger.println("Issue NAVER Works Token...");
+            assert credential != null;
+            List<String> privateKeys = credential.getPrivateKeys();
+
+            final App app = new App(clientId, clientSecret, serviceAccount, privateKeys.get(0));
+
+            final NaverWorksAuth auth = new NaverWorksAuth();
             token = auth.requestNaverWorksToken(app);
         } catch (URISyntaxException | GeneralSecurityException e) {
             throw new RuntimeExceptionWrapper(e);
         }
 
-        Bot bot = new Bot(botId, channelId);
         MessageService messageService = new NaverWorksMessageService();
-
         final Message message = messageService.write(
                 messages,
                 backgroundImageUrl,
@@ -182,8 +175,9 @@ public class NaverWorks
         );
 
         try {
-            String response = messageService.send(token, bot, message);
-            logger.println(response);
+            logger.println("Send NAVER Works Messages...");
+            Bot bot = new Bot(botId, channelId);
+            messageService.send(token, bot, message);
         } catch (URISyntaxException e) {
             throw new RuntimeExceptionWrapper(e);
         }
