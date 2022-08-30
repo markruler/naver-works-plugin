@@ -3,11 +3,16 @@ package io.jenkins.plugins.naverworks.auth;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+import java.io.Serializable;
+
 /**
  * NAVER Works Token
  */
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class Token {
+public class Token implements Serializable {
+
+    private static final long serialVersionUID = 2L;
+
     private String accessToken;
     private String refreshToken;
     private String scope;
