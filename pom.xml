@@ -15,7 +15,6 @@
     <version>${revision}${changelist}</version>
     <packaging>hpi</packaging>
     <name>NAVER Works Plugin</name>
-    <!--<url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>-->
     <url>https://github.com/markruler/${project.artifactId}-plugin</url>
     <licenses>
         <license>
@@ -45,7 +44,6 @@
 
         <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
         <jenkins.version>2.332.4</jenkins.version>
-        <!--<gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>-->
         <gitHubRepo>markruler/${project.artifactId}-plugin</gitHubRepo>
     </properties>
 

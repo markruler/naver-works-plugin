@@ -2,8 +2,16 @@ package io.jenkins.plugins.naverworks.auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.CredentialsScope;
+import com.cloudbees.plugins.credentials.CredentialsStore;
+import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
+import com.cloudbees.plugins.credentials.domains.Domain;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hudson.security.ACL;
 import io.jenkins.plugins.naverworks.App;
+import jenkins.model.Jenkins;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
@@ -20,10 +28,13 @@ import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * NAVER Works 인증 요청기
@@ -33,11 +44,13 @@ import java.util.Map;
  */
 public class NaverWorksAuth {
 
+    private static final Logger LOG = Logger.getLogger(NaverWorksAuth.class.getName());
+
     public static final String AUTH_API = "https://auth.worksmobile.com/oauth2/v2.0/token";
+    private static final String NAVER_WORKS_TOKEN_ID = "naver-works-token";
 
     /**
      * 서비스 어카운트를 통해 토큰을 요청한다.
-     * *
      *
      * @return NAVER Works Token
      * @throws URISyntaxException
@@ -46,6 +59,28 @@ public class NaverWorksAuth {
      */
     public Token requestNaverWorksToken(final App app)
             throws URISyntaxException, IOException, GeneralSecurityException {
+
+        // Lookup NAVER Works Token
+        List<NaverWorksTokenCredentials> naverWorksTokenCredentialsList = CredentialsProvider.lookupCredentials(
+                NaverWorksTokenCredentials.class,
+                Jenkins.get(),
+                ACL.SYSTEM,
+                Collections.emptyList()
+        );
+
+        final NaverWorksTokenCredentials naverWorksTokenCredential = CredentialsMatchers.firstOrNull(
+                naverWorksTokenCredentialsList,
+                CredentialsMatchers.withId(NAVER_WORKS_TOKEN_ID)
+        );
+
+        if (naverWorksTokenCredential != null) {
+            Token token = naverWorksTokenCredential.getToken();
+            LOG.log(Level.INFO, "{0} Token exists.", token.getTokenType());
+            return token;
+        }
+
+        // Request New Token
+        LOG.log(Level.INFO, "Token not found.");
 
         final String assertion = generateJwtWithServiceAccount(app);
         final String encodedGrantType = URLEncoder.encode(
@@ -67,8 +102,25 @@ public class NaverWorksAuth {
 
             String httpResponse = httpClient.execute(httpRequest, new NaverWorksResponseHandler());
             final ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(httpResponse, Token.class);
+            Token token = objectMapper.readValue(httpResponse, Token.class);
+
+            NaverWorksTokenCredentials credential = new NaverWorksTokenCredentials(
+                    CredentialsScope.GLOBAL,
+                    NAVER_WORKS_TOKEN_ID,
+                    "NAVER Works Token",
+                    token
+            );
+            naverWorksTokenCredentialsList.add(credential);
+
+            CredentialsStore store = CredentialsProvider.lookupStores(Jenkins.get()).iterator().next();
+            store.addCredentials(Domain.global(), credential);
+
+            SystemCredentialsProvider provider = SystemCredentialsProvider.getInstance();
+            provider.save();
+
+            return token;
         }
+
     }
 
     /**
