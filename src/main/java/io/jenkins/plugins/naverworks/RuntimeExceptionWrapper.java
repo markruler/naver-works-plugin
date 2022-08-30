@@ -1,4 +1,4 @@
-package io.jenkins.plugins.naverworks.exception;
+package io.jenkins.plugins.naverworks;
 
 public class RuntimeExceptionWrapper extends RuntimeException {
 

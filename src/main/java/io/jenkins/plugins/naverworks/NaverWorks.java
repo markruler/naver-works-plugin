@@ -25,9 +25,9 @@ import io.jenkins.plugins.naverworks.bot.Bot;
 import io.jenkins.plugins.naverworks.bot.MessageService;
 import io.jenkins.plugins.naverworks.bot.NaverWorksMessageService;
 import io.jenkins.plugins.naverworks.bot.message.Message;
-import io.jenkins.plugins.naverworks.exception.RuntimeExceptionWrapper;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
+import org.apache.hc.core5.http.HttpStatus;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -152,33 +152,44 @@ public class NaverWorks
 
         logger.println(this);
 
-        final Token token;
+        if (credential == null) {
+            throw new PrivateKeyCredentialsNotFoundException("Credential not found.");
+        }
+
+        final List<String> privateKeys = credential.getPrivateKeys();
+        final App app = new App(clientId, clientSecret, serviceAccount, privateKeys.get(0));
+        final NaverWorksAuth auth = new NaverWorksAuth();
+        Token token;
+
         try {
             logger.println("Issue NAVER Works Token...");
-            assert credential != null;
-            List<String> privateKeys = credential.getPrivateKeys();
-
-            final App app = new App(clientId, clientSecret, serviceAccount, privateKeys.get(0));
-
-            final NaverWorksAuth auth = new NaverWorksAuth();
             token = auth.requestNaverWorksToken(app);
         } catch (URISyntaxException | GeneralSecurityException e) {
             throw new RuntimeExceptionWrapper(e);
         }
 
-        MessageService messageService = new NaverWorksMessageService();
-        final Message message = messageService.write(
-                messages,
-                backgroundImageUrl,
-                contentActionLabel,
-                contentActionLink
-        );
-
         try {
+            final MessageService messageService = new NaverWorksMessageService();
+            final Message message = messageService.write(
+                    messages,
+                    backgroundImageUrl,
+                    contentActionLabel,
+                    contentActionLink
+            );
+
             logger.println("Send NAVER Works Messages...");
             Bot bot = new Bot(botId, channelId);
-            messageService.send(token, bot, message);
-        } catch (URISyntaxException e) {
+
+            String response = messageService.send(token, bot, message);
+            logger.println("Response..." + response);
+
+            // one more try
+            if (response.equals(String.valueOf(HttpStatus.SC_FORBIDDEN))) {
+                token = auth.requestNewToken(app);
+                response = messageService.send(token, bot, message);
+                logger.println("Retry response..." + response);
+            }
+        } catch (URISyntaxException | GeneralSecurityException e) {
             throw new RuntimeExceptionWrapper(e);
         }
     }
