@@ -1,8 +1,9 @@
 # https://github.com/apps/release-drafter
-# https://github.com/jenkinsci/.github
+# https://github.com/jenkinsci/.github/blob/master/.github/release-drafter.adoc
 _extends: .github
-#tag-template: naver-works-$NEXT_MINOR_VERSION
-template: |
-  ## What’s Changed
+tag-template: naver-works-$NEXT_PATCH_VERSION
+version-template: $MAJOR.$MINOR.$PATCH
 
+template: |
+  <!-- Optional: add a release summary here -->
   $CHANGES
