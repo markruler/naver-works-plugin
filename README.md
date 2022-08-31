@@ -3,7 +3,6 @@
 ## Prerequisite
 
 - Java 1.8
-- Maven 3.8.3
 
 ## Test running
 
