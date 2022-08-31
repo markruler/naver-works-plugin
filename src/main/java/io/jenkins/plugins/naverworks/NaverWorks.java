@@ -126,11 +126,11 @@ public class NaverWorks
 
     @Override
     public String toString() {
-        return "NAVER Works{" +
-                "backgroundImageUrl='" + backgroundImageUrl +
+        return "NaverWorks{" +
+                "backgroundImageUrl='" + backgroundImageUrl + "'" +
                 ", messages=" + messages +
-                ", contentActionLabel='" + contentActionLabel +
-                ", contentActionLink='" + contentActionLink +
+                ", contentActionLabel='" + contentActionLabel + "'" +
+                ", contentActionLink='" + contentActionLink + "'" +
                 '}';
     }
 
@@ -151,6 +151,11 @@ public class NaverWorks
                 (DomainRequirement) null);
 
         logger.println(this);
+
+        String actionLink = contentActionLink;
+        if ("BUILD_URL".equals(actionLink)) {
+            actionLink = env.get("BUILD_URL");
+        }
 
         if (credential == null) {
             throw new PrivateKeyCredentialsNotFoundException("Credential not found.");
@@ -174,7 +179,7 @@ public class NaverWorks
                     messages,
                     backgroundImageUrl,
                     contentActionLabel,
-                    contentActionLink
+                    actionLink
             );
 
             logger.println("Send NAVER Works Messages...");
@@ -254,6 +259,14 @@ public class NaverWorks
 
         public FormValidation doCheckChannelId(@QueryParameter String value) {
             return isBlank(value, "Channel ID is required.");
+        }
+
+        public FormValidation doCheckContentActionLabel(@QueryParameter String value) {
+            return isBlank(value, "Content Action Label is required.");
+        }
+
+        public FormValidation doCheckContentActionLink(@QueryParameter String value) {
+            return isBlank(value, "Content Action Link is required.");
         }
 
         private FormValidation isBlank(String value, String message) {
