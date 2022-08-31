@@ -1,6 +1,7 @@
 package io.jenkins.plugins.naverworks.bot;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jenkins.plugins.naverworks.RuntimeExceptionWrapper;
 import io.jenkins.plugins.naverworks.auth.NaverWorksResponseHandler;
 import io.jenkins.plugins.naverworks.auth.Token;
 import io.jenkins.plugins.naverworks.bot.message.Action;
@@ -36,32 +37,6 @@ public class NaverWorksMessageService implements MessageService {
 
     public static final String BOT_API = "https://www.worksapis.com/v1.0/bots";
 
-    public String send(final Token token, final Bot bot, final Message message)
-            throws URISyntaxException, IOException {
-
-        try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            final String CHANNEL_BOT_API = String.format(
-                    "%s/%s/channels/%s/messages",
-                    BOT_API,
-                    bot.getId(),
-                    bot.getChannelId()
-            );
-            URI uri = new URI(CHANNEL_BOT_API);
-
-            HttpPost httpRequest = new HttpPost(uri);
-            httpRequest.addHeader("Authorization", "Bearer " + token.getAccessToken());
-            httpRequest.addHeader("Accept", APPLICATION_JSON);
-            httpRequest.addHeader("Content-Type", APPLICATION_JSON);
-
-            final ObjectMapper objectMapper = new ObjectMapper();
-            final String messageJSON = objectMapper.writeValueAsString(message);
-            final StringEntity requestEntity = new StringEntity(messageJSON, StandardCharsets.UTF_8);
-            httpRequest.setEntity(requestEntity);
-
-            return httpClient.execute(httpRequest, new NaverWorksResponseHandler());
-        }
-    }
-
     @Override
     public Message write(
             List<Map<String, String>> messages,
@@ -74,11 +49,12 @@ public class NaverWorksMessageService implements MessageService {
         final int maxListTemplateElements = 4;
 
         if (messages == null || messages.isEmpty()) {
-            LinkContent content = new LinkContent(
-                    "Changes have been deployed.",
-                    contentActionLabel,
-                    contentActionLink
-            );
+            LinkContent content =
+                    new LinkContent(
+                            "Changes have been deployed.",
+                            contentActionLabel,
+                            contentActionLink
+                    );
             message = new LinkMessage(content);
         } else if (messages.size() <= maxListTemplateElements) {
             ListTemplateContent content = new ListTemplateContent();
@@ -94,6 +70,34 @@ public class NaverWorksMessageService implements MessageService {
             message = new CarouselMessage(content);
         }
         return message;
+    }
+
+    public String send(final Token token, final Bot bot, final Message message) {
+
+        try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            final String CHANNEL_BOT_API =
+                    String.format(
+                            "%s/%s/channels/%s/messages",
+                            BOT_API,
+                            bot.getId(),
+                            bot.getChannelId()
+                    );
+            URI uri = new URI(CHANNEL_BOT_API);
+
+            HttpPost httpRequest = new HttpPost(uri);
+            httpRequest.addHeader("Authorization", "Bearer " + token.getAccessToken());
+            httpRequest.addHeader("Accept", APPLICATION_JSON);
+            httpRequest.addHeader("Content-Type", APPLICATION_JSON);
+
+            final ObjectMapper objectMapper = new ObjectMapper();
+            final String messageJSON = objectMapper.writeValueAsString(message);
+            final StringEntity requestEntity = new StringEntity(messageJSON, StandardCharsets.UTF_8);
+            httpRequest.setEntity(requestEntity);
+
+            return httpClient.execute(httpRequest, new NaverWorksResponseHandler());
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeExceptionWrapper(e);
+        }
     }
 
 }

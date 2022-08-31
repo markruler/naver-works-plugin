@@ -18,6 +18,7 @@ public class Token implements Serializable {
     private String scope;
     private String tokenType;
     private int expiresIn;
+    private long expired;
 
     public String getAccessToken() {
         return accessToken;
@@ -57,5 +58,13 @@ public class Token implements Serializable {
 
     public void setExpiresIn(int expiresIn) {
         this.expiresIn = expiresIn;
+    }
+
+    public long getExpired() {
+        return expired;
+    }
+
+    public void setExpired(long expired) {
+        this.expired = expired;
     }
 }

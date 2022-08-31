@@ -18,9 +18,9 @@ public class NaverWorksTokenCredentials extends BaseStandardCredentials {
 
     @DataBoundConstructor
     public NaverWorksTokenCredentials(
-            CredentialsScope scope,
-            String id,
-            String description,
+            @NonNull CredentialsScope scope,
+            @NonNull String id,
+            @NonNull String description,
             @NonNull Token token) {
         super(scope, id, description);
         this.token = token;

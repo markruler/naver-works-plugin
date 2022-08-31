@@ -2,6 +2,7 @@ package io.jenkins.plugins.naverworks.auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.cloudbees.plugins.credentials.CredentialsMatcher;
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.CredentialsScope;
@@ -11,6 +12,7 @@ import com.cloudbees.plugins.credentials.domains.Domain;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hudson.security.ACL;
 import io.jenkins.plugins.naverworks.App;
+import io.jenkins.plugins.naverworks.RuntimeExceptionWrapper;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -27,6 +29,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.interfaces.RSAPrivateKey;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -37,8 +42,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * NAVER Works 인증 요청기
- * <p>
+ * NAVER Works 인증 요청
  *
  * @see <a href="https://developers.worksmobile.com/kr/reference/authorization-sa">서비스 계정으로 인증(JWT)</a>
  */
@@ -53,42 +57,65 @@ public class NaverWorksAuth {
      * 서비스 어카운트를 통해 토큰을 요청한다.
      *
      * @return NAVER Works Token
-     * @throws URISyntaxException
-     * @throws IOException
-     * @throws GeneralSecurityException
      */
-    public Token requestNaverWorksToken(final App app)
-            throws URISyntaxException, IOException, GeneralSecurityException {
+    public Token requestNaverWorksToken(final App app) {
 
-        List<NaverWorksTokenCredentials> credentials = CredentialsProvider.lookupCredentials(
-                NaverWorksTokenCredentials.class,
-                Jenkins.get(),
-                ACL.SYSTEM,
-                Collections.emptyList()
-        );
+        List<NaverWorksTokenCredentials> credentials =
+                CredentialsProvider.lookupCredentials(
+                        NaverWorksTokenCredentials.class,
+                        Jenkins.get(),
+                        ACL.SYSTEM,
+                        Collections.emptyList()
+                );
 
         // Lookup NAVER Works Token
-        NaverWorksTokenCredentials credential = lookupToken(credentials);
-        if (credential != null) {
-            Token token = credential.getToken();
+        NaverWorksTokenCredentials storedCredential = lookupToken(credentials);
+        if (storedCredential != null) {
+            Token token = storedCredential.getToken();
             LOG.log(Level.INFO, "{0} Token exists.", token.getTokenType());
-            return token;
+
+            final long expired = token.getExpired();
+            final long now = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+9"));
+            if (expired >= now) {
+                LOG.log(Level.INFO, "Stored token is not expired.");
+                return token;
+            }
         }
 
         // Request New Token
-        LOG.log(Level.INFO, "Token not found.");
+        try {
+            return saveNewToken(app, storedCredential);
+        } catch (Exception e) {
+            throw new RuntimeExceptionWrapper(e);
+        }
+    }
+
+    /**
+     * 새로운 토큰을 발급 받아서 저장한다.
+     *
+     * @param app              NAVER Works 앱
+     * @param storedCredential 기존에 저장 중인 토큰
+     * @return 새로운 토큰
+     */
+    private Token saveNewToken(App app, NaverWorksTokenCredentials storedCredential)
+            throws GeneralSecurityException, IOException, URISyntaxException {
+
         Token token = requestNewToken(app);
 
-        credential = new NaverWorksTokenCredentials(
-                CredentialsScope.GLOBAL,
-                NAVER_WORKS_TOKEN_ID,
-                "NAVER Works Token",
-                token
-        );
-        credentials.add(credential);
+        NaverWorksTokenCredentials newCredential =
+                new NaverWorksTokenCredentials(
+                        CredentialsScope.GLOBAL,
+                        NAVER_WORKS_TOKEN_ID,
+                        "NAVER Works Token",
+                        token
+                );
 
         CredentialsStore store = CredentialsProvider.lookupStores(Jenkins.get()).iterator().next();
-        store.addCredentials(Domain.global(), credential);
+        if (storedCredential != null) {
+            store.updateCredentials(Domain.global(), storedCredential, newCredential);
+        } else {
+            store.addCredentials(Domain.global(), newCredential);
+        }
 
         SystemCredentialsProvider provider = SystemCredentialsProvider.getInstance();
         provider.save();
@@ -100,16 +127,20 @@ public class NaverWorksAuth {
      * Token 조회
      *
      * @param credentials NAVER Works Token Credentials 목록
-     * @return id 값이 {@link NAVER_WORKS_TOKEN_ID} token
+     * @return id 값이 {@link NAVER_WORKS_TOKEN_ID}인 token
      */
     private NaverWorksTokenCredentials lookupToken(List<NaverWorksTokenCredentials> credentials) {
-        return CredentialsMatchers.firstOrNull(
-                credentials,
-                CredentialsMatchers.withId(NAVER_WORKS_TOKEN_ID)
-        );
+        final CredentialsMatcher matcher = CredentialsMatchers.withId(NAVER_WORKS_TOKEN_ID);
+        return CredentialsMatchers.firstOrNull(credentials, matcher);
     }
 
-    public Token requestNewToken(App app)
+    /**
+     * 새로운 토큰 발급을 요청한다.
+     *
+     * @param app NAVER Works app
+     * @return 인증 토큰
+     */
+    private Token requestNewToken(App app)
             throws GeneralSecurityException, IOException, URISyntaxException {
 
         final String assertion = generateJwtWithServiceAccount(app);
@@ -125,6 +156,8 @@ public class NaverWorksAuth {
         params.add(new BasicNameValuePair("scope", "bot"));
 
         try (final CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            LOG.log(Level.INFO, "Request new token.");
+
             URI uri = new URI(AUTH_API);
             HttpPost httpRequest = new HttpPost(uri);
             httpRequest.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -132,7 +165,11 @@ public class NaverWorksAuth {
 
             String httpResponse = httpClient.execute(httpRequest, new NaverWorksResponseHandler());
             final ObjectMapper objectMapper = new ObjectMapper();
-            return objectMapper.readValue(httpResponse, Token.class);
+            Token token = objectMapper.readValue(httpResponse, Token.class);
+            LocalDateTime expired = LocalDateTime.now().plus(1, ChronoUnit.HOURS);
+            token.setExpired(expired.toEpochSecond(ZoneOffset.of("+9")));
+
+            return token;
         }
     }
 

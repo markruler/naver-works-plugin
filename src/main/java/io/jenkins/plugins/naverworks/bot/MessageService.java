@@ -3,15 +3,13 @@ package io.jenkins.plugins.naverworks.bot;
 import io.jenkins.plugins.naverworks.auth.Token;
 import io.jenkins.plugins.naverworks.bot.message.Message;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
 public interface MessageService {
 
     /**
-     * 메시지를 만든다.
+     * 메시지를 작성한다.
      *
      * @param messages           내용
      * @param backgroundImageUrl 커버 이미지
@@ -29,6 +27,5 @@ public interface MessageService {
      * @param message 전송할 메시지
      * @return API 응답 메시지
      */
-    String send(final Token token, final Bot bot, final Message message)
-            throws URISyntaxException, IOException;
+    String send(final Token token, final Bot bot, final Message message);
 }

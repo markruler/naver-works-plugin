@@ -10,7 +10,9 @@ public class App {
     public App(
             String clientId,
             String clientSecret,
-            String serviceAccount, String privateKey) {
+            String serviceAccount,
+            String privateKey
+    ) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.serviceAccount = serviceAccount;
