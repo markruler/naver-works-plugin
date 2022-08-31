@@ -30,29 +30,23 @@ public class NaverWorksResponseHandler
         // RateLimit-Reset      기준 시간 갱신까지 남은 시간(초)
         final Header[] headers = response.getHeaders();
         for (Header header : headers) {
-            LOG.log(Level.INFO, "{0}: {1}", new String[]{header.getName(), header.getValue()});
+            LOG.log(Level.FINE, "{0}: {1}", new String[]{header.getName(), header.getValue()});
         }
 
         final int status = response.getCode();
-        if (status >= HttpStatus.SC_SUCCESS
-                && status < HttpStatus.SC_REDIRECTION) {
+        final HttpEntity httpEntity = response.getEntity();
+        final String entity = EntityUtils.toString(httpEntity, StandardCharsets.UTF_8);
 
-            final HttpEntity entity = response.getEntity();
-            if (entity != null) {
-                return EntityUtils.toString(entity, StandardCharsets.UTF_8);
-            }
-            return String.valueOf(status);
+        if (HttpStatus.SC_SUCCESS <= status && status < HttpStatus.SC_REDIRECTION) {
+            return entity;
         }
+
         if (status == HttpStatus.SC_FORBIDDEN) {
             return String.valueOf(status);
         }
 
-        String responseMessage = String.format(
-                "Unexpected response status - %d:%s",
-                status,
-                EntityUtils.toString(response.getEntity())
-        );
-        throw new ClientProtocolException(responseMessage);
+        String unexpected = String.format("Unexpected response status - %d:%s", status, entity);
+        throw new ClientProtocolException(unexpected);
     }
 
 }
