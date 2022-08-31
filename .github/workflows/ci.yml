@@ -1,0 +1,22 @@
+# Automates creation of Release Drafts using Release Drafter
+# More Info: https://github.com/jenkinsci/.github/blob/master/.github/release-drafter.adoc
+name: ci
+
+on: [ push ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ 8, 11, 17 ]
+    # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'adopt'
+      - name: Build with Maven
+        run: mvn clean install
