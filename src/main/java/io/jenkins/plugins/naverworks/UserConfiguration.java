@@ -10,19 +10,22 @@ public class UserConfiguration {
     private final String contentActionLabel;
     private final String contentActionLink;
     private final String notification;
+    private final String contentType;
 
     public UserConfiguration(
             List<Map<String, String>> messages,
             String backgroundImageUrl,
             String contentActionLabel,
             String contentActionLink,
-            String notification
+            String notification,
+            String contentType
     ) {
         this.messages = messages;
         this.backgroundImageUrl = backgroundImageUrl;
         this.contentActionLabel = contentActionLabel;
         this.contentActionLink = contentActionLink;
         this.notification = notification;
+        this.contentType = contentType;
     }
 
     public List<Map<String, String>> getMessages() {
@@ -43,5 +46,9 @@ public class UserConfiguration {
 
     public String getNotification() {
         return notification;
+    }
+
+    public String getContentType() {
+        return contentType;
     }
 }

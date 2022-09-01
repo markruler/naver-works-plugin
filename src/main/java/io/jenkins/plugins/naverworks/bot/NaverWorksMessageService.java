@@ -44,24 +44,27 @@ public class NaverWorksMessageService implements MessageService {
     public static final String BOT_API = "https://www.worksapis.com/v1.0/bots";
 
     @Override
-    public Message write(UserConfiguration parameter) {
+    public Message write(UserConfiguration userConfiguration) {
+
+        final List<Map<String, String>> messages = userConfiguration.getMessages();
+        final String backgroundImageUrl = userConfiguration.getBackgroundImageUrl();
+        final String contentActionLabel = userConfiguration.getContentActionLabel();
+        final String contentActionLink = userConfiguration.getContentActionLink();
+        String notification = userConfiguration.getNotification();
+
+        // FIXME: `type` parameter is required.
+        final String type = userConfiguration.getContentType();
+        if (isNotBlank(type)) {
+            return writeTemplateMessage(userConfiguration);
+        }
 
         final int maxListTemplateElements = 4;
-
-        final List<Map<String, String>> messages = parameter.getMessages();
-        final String backgroundImageUrl = parameter.getBackgroundImageUrl();
-        final String contentActionLabel = parameter.getContentActionLabel();
-        final String contentActionLink = parameter.getContentActionLink();
-        String notification = parameter.getNotification();
-
         if (messages == null || messages.isEmpty()) {
             if (isBlank(notification)) {
                 notification = "Changes have been deployed.";
             }
 
-            if (isNotBlank(contentActionLabel)
-                    && isNotBlank(contentActionLink)
-                    && isBlank(backgroundImageUrl)) {
+            if (isNotBlank(contentActionLabel) && isNotBlank(contentActionLink)) {
                 LinkContent content =
                         new LinkContent(
                                 notification,
@@ -87,6 +90,39 @@ public class NaverWorksMessageService implements MessageService {
         CarouselContent content = new CarouselContent();
         content.setMessages(messages, backgroundImageUrl, contentActionLink);
         return new CarouselMessage(content);
+    }
+
+    private Message writeTemplateMessage(UserConfiguration userConfiguration) {
+
+        final List<Map<String, String>> messages = userConfiguration.getMessages();
+        final String backgroundImageUrl = userConfiguration.getBackgroundImageUrl();
+        final String contentActionLabel = userConfiguration.getContentActionLabel();
+        final String contentActionLink = userConfiguration.getContentActionLink();
+        String notification = userConfiguration.getNotification();
+        String contentType = userConfiguration.getContentType();
+
+        switch (contentType) {
+            case "text":
+                TextContent textContent = new TextContent(notification);
+                return new TextMessage(textContent);
+            case "link":
+                LinkContent linkContent = new LinkContent(notification, contentActionLabel, contentActionLink);
+                return new LinkMessage(linkContent);
+            case "list-template":
+                ListTemplateContent listTemplateContent = new ListTemplateContent();
+                listTemplateContent.setMessages(messages);
+                listTemplateContent.setCoverData(new CoverData(backgroundImageUrl));
+                Action action = new Action("uri", "more", contentActionLink);
+                listTemplateContent.setActions(Collections.singletonList(action));
+                return new ListTemplateMessage(listTemplateContent);
+            case "carousel":
+                CarouselContent carouselContent = new CarouselContent();
+                carouselContent.setMessages(messages, backgroundImageUrl, contentActionLink);
+                return new CarouselMessage(carouselContent);
+            default:
+                TextContent defaultContent = new TextContent("Changes have been deployed.");
+                return new TextMessage(defaultContent);
+        }
     }
 
     public String send(final Token token, final Bot bot, final Message message) {

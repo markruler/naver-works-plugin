@@ -55,6 +55,7 @@ public class NaverWorks
     private final String contentActionLabel;
     private final String contentActionLink;
     private final String notification;
+    private final String contentType;
 
     @DataBoundConstructor
     public NaverWorks(
@@ -67,7 +68,8 @@ public class NaverWorks
             List<Map<String, String>> messages,
             String contentActionLabel,
             String contentActionLink,
-            String notification
+            String notification,
+            String contentType
     ) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
@@ -79,6 +81,7 @@ public class NaverWorks
         this.contentActionLabel = contentActionLabel;
         this.contentActionLink = contentActionLink;
         this.notification = notification;
+        this.contentType = contentType;
     }
 
     public String getClientId() {
@@ -130,6 +133,10 @@ public class NaverWorks
         return notification;
     }
 
+    public String getContentType() {
+        return contentType;
+    }
+
     @Override
     public String toString() {
         return "NaverWorks{" +
@@ -138,6 +145,7 @@ public class NaverWorks
                 ", contentActionLabel='" + contentActionLabel + "'" +
                 ", contentActionLink='" + contentActionLink + "'" +
                 ", notification='" + notification + "'" +
+                ", contentType='" + contentType + "'" +
                 '}';
     }
 
@@ -184,8 +192,8 @@ public class NaverWorks
                         backgroundImageUrl,
                         contentActionLabel,
                         actionLink,
-                        notification
-                );
+                        notification,
+                        contentType);
         final Message message = messageService.write(userConfiguration);
 
         logger.println("Send NAVER Works Messages...");

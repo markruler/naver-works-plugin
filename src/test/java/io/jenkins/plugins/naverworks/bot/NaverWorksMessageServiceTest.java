@@ -30,15 +30,22 @@ class NaverWorksMessageServiceTest {
     @ParameterizedTest
     @ValueSource(ints = 0)
     void if_message_is_empty_sut_returns_text_message(int size) {
+
         List<Map<String, String>> messages = MessageFixture.generate(size);
+        String backgroundImageUrl = null;
+        String contentActionLabel = null;
+        String contentActionLink = null;
+        String notification = null;
+        String contentType = null;
 
         UserConfiguration userConfiguration =
                 new UserConfiguration(
                         messages,
-                        null,
-                        null,
-                        null,
-                        null
+                        backgroundImageUrl,
+                        contentActionLabel,
+                        contentActionLink,
+                        notification,
+                        contentType
                 );
         Message message = service.write(userConfiguration);
 
@@ -50,16 +57,22 @@ class NaverWorksMessageServiceTest {
     @ParameterizedTest
     @ValueSource(ints = 0)
     void if_message_is_empty_but_notification_exists_sut_returns_text_message(int size) {
-        List<Map<String, String>> messages = MessageFixture.generate(size);
 
-        final String notification = "Notify";
+        List<Map<String, String>> messages = MessageFixture.generate(size);
+        String backgroundImageUrl = null;
+        String contentActionLabel = null;
+        String contentActionLink = null;
+        String notification = "Notify";
+        String contentType = null;
+
         UserConfiguration userConfiguration =
                 new UserConfiguration(
                         messages,
-                        null,
-                        null,
-                        null,
-                        "Notify"
+                        backgroundImageUrl,
+                        contentActionLabel,
+                        contentActionLink,
+                        notification,
+                        contentType
                 );
         Message message = service.write(userConfiguration);
 
@@ -71,16 +84,22 @@ class NaverWorksMessageServiceTest {
     @ParameterizedTest
     @ValueSource(ints = 0)
     void if_message_is_empty_but_content_link_exists_sut_returns_link_message(int size) {
-        List<Map<String, String>> messages = MessageFixture.generate(size);
 
-        final String notification = "Notify";
+        List<Map<String, String>> messages = MessageFixture.generate(size);
+        String backgroundImageUrl = null;
+        String contentActionLabel = "Go to Jenkins";
+        String contentActionLink = "https://www.jenkins.io/";
+        String notification = "Notify";
+        String contentType = null;
+
         UserConfiguration userConfiguration =
                 new UserConfiguration(
                         messages,
-                        null,
-                        "Go to Jenkins",
-                        "https://www.jenkins.io/",
-                        notification
+                        backgroundImageUrl,
+                        contentActionLabel,
+                        contentActionLink,
+                        notification,
+                        contentType
                 );
         Message message = service.write(userConfiguration);
 
@@ -92,15 +111,22 @@ class NaverWorksMessageServiceTest {
     @ParameterizedTest
     @ValueSource(ints = maxListTemplateContent)
     void if_messages_size_is_list_template_size_sut_returns_list_template_message(int size) {
+
         List<Map<String, String>> messages = MessageFixture.generate(size);
+        String backgroundImageUrl = null;
+        String contentActionLabel = null;
+        String contentActionLink = null;
+        String notification = null;
+        String contentType = null;
 
         UserConfiguration userConfiguration =
                 new UserConfiguration(
                         messages,
-                        null,
-                        null,
-                        null,
-                        null
+                        backgroundImageUrl,
+                        contentActionLabel,
+                        contentActionLink,
+                        notification,
+                        contentType
                 );
         Message message = service.write(userConfiguration);
 
@@ -110,15 +136,22 @@ class NaverWorksMessageServiceTest {
     @ParameterizedTest
     @ValueSource(ints = maxListTemplateContent + 1)
     void if_messages_size_is_more_than_list_template_size_sut_returns_carousel_message(int size) {
+
         List<Map<String, String>> messages = MessageFixture.generate(size);
+        String backgroundImageUrl = null;
+        String contentActionLabel = null;
+        String contentActionLink = null;
+        String notification = null;
+        String contentType = null;
 
         UserConfiguration userConfiguration =
                 new UserConfiguration(
                         messages,
-                        null,
-                        null,
-                        null,
-                        null
+                        backgroundImageUrl,
+                        contentActionLabel,
+                        contentActionLink,
+                        notification,
+                        contentType
                 );
         Message message = service.write(userConfiguration);
 
