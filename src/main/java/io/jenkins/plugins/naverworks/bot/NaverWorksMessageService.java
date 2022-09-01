@@ -13,6 +13,8 @@ import io.jenkins.plugins.naverworks.bot.message.LinkMessage;
 import io.jenkins.plugins.naverworks.bot.message.ListTemplateContent;
 import io.jenkins.plugins.naverworks.bot.message.ListTemplateMessage;
 import io.jenkins.plugins.naverworks.bot.message.Message;
+import io.jenkins.plugins.naverworks.UserConfiguration;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -38,38 +40,52 @@ public class NaverWorksMessageService implements MessageService {
     public static final String BOT_API = "https://www.worksapis.com/v1.0/bots";
 
     @Override
-    public Message write(
-            List<Map<String, String>> messages,
-            String backgroundImageUrl,
-            String contentActionLabel,
-            String contentActionLink
-    ) {
+    public Message write(UserConfiguration parameter) {
 
-        Message message;
         final int maxListTemplateElements = 4;
 
+        final List<Map<String, String>> messages = parameter.getMessages();
+        final String backgroundImageUrl = parameter.getBackgroundImageUrl();
+        final String contentActionLabel = parameter.getContentActionLabel();
+        final String contentActionLink = parameter.getContentActionLink();
+        String notification = parameter.getNotification();
+
         if (messages == null || messages.isEmpty()) {
+            if (StringUtils.isBlank(notification)) {
+                notification = "Changes have been deployed.";
+            }
             LinkContent content =
                     new LinkContent(
-                            "Changes have been deployed.",
+                            notification,
                             contentActionLabel,
                             contentActionLink
                     );
-            message = new LinkMessage(content);
-        } else if (messages.size() <= maxListTemplateElements) {
+            return new LinkMessage(content);
+        }
+
+        if (messages.size() == 1 && StringUtils.isBlank(backgroundImageUrl)) {
+            LinkContent content =
+                    new LinkContent(
+                            notification,
+                            contentActionLabel,
+                            contentActionLink
+                    );
+            return new LinkMessage(content);
+        }
+
+        if (messages.size() <= maxListTemplateElements) {
             ListTemplateContent content = new ListTemplateContent();
             content.setCoverData(new CoverData(backgroundImageUrl));
             content.setMessages(messages);
             Action action = new Action("uri", contentActionLabel, contentActionLink);
             content.setActions(Collections.singletonList(action));
 
-            message = new ListTemplateMessage(content);
-        } else {
-            CarouselContent content = new CarouselContent();
-            content.setMessages(messages, backgroundImageUrl, contentActionLink);
-            message = new CarouselMessage(content);
+            return new ListTemplateMessage(content);
         }
-        return message;
+
+        CarouselContent content = new CarouselContent();
+        content.setMessages(messages, backgroundImageUrl, contentActionLink);
+        return new CarouselMessage(content);
     }
 
     public String send(final Token token, final Bot bot, final Message message) {

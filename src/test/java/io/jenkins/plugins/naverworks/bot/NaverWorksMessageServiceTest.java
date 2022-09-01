@@ -1,6 +1,8 @@
 package io.jenkins.plugins.naverworks.bot;
 
+import io.jenkins.plugins.naverworks.UserConfiguration;
 import io.jenkins.plugins.naverworks.bot.message.CarouselContent;
+import io.jenkins.plugins.naverworks.bot.message.Content;
 import io.jenkins.plugins.naverworks.bot.message.LinkContent;
 import io.jenkins.plugins.naverworks.bot.message.ListTemplateContent;
 import io.jenkins.plugins.naverworks.bot.message.Message;
@@ -29,34 +31,58 @@ class NaverWorksMessageServiceTest {
     void if_message_is_empty_sut_returns_link_message(int size) {
         List<Map<String, String>> messages = MessageFixture.generate(size);
 
-        Message message = service.write(
-                messages,
-                null,
-                null,
-                null
-        );
+        UserConfiguration userConfiguration =
+                new UserConfiguration(
+                        messages,
+                        null,
+                        null,
+                        null,
+                        null
+                );
+        Message message = service.write(userConfiguration);
 
-        assertThat(message.getContent())
-                .as("should be LinkContent")
-                .isInstanceOf(LinkContent.class);
+        Content content = message.getContent();
+        assertThat(content).isInstanceOf(LinkContent.class);
+        assertThat(((LinkContent) content).getContentText()).isEqualTo("Changes have been deployed.");
     }
 
+    @ParameterizedTest
+    @ValueSource(ints = 0)
+    void if_message_is_empty_but_notification_exists_sut_returns_link_message(int size) {
+        List<Map<String, String>> messages = MessageFixture.generate(size);
+
+        final String notification = "Notify";
+        UserConfiguration userConfiguration =
+                new UserConfiguration(
+                        messages,
+                        null,
+                        null,
+                        null,
+                        notification
+                );
+        Message message = service.write(userConfiguration);
+
+        Content content = message.getContent();
+        assertThat(content).isInstanceOf(LinkContent.class);
+        assertThat(((LinkContent) content).getContentText()).isEqualTo(notification);
+    }
 
     @ParameterizedTest
     @ValueSource(ints = maxListTemplateContent)
     void if_messages_size_is_list_template_size_sut_returns_list_template_message(int size) {
         List<Map<String, String>> messages = MessageFixture.generate(size);
 
-        Message message = service.write(
-                messages,
-                null,
-                null,
-                null
-        );
+        UserConfiguration userConfiguration =
+                new UserConfiguration(
+                        messages,
+                        null,
+                        null,
+                        null,
+                        null
+                );
+        Message message = service.write(userConfiguration);
 
-        assertThat(message.getContent())
-                .as("should be ListTemplateContent")
-                .isInstanceOf(ListTemplateContent.class);
+        assertThat(message.getContent()).isInstanceOf(ListTemplateContent.class);
     }
 
     @ParameterizedTest
@@ -64,15 +90,16 @@ class NaverWorksMessageServiceTest {
     void if_messages_size_is_more_than_list_template_size_sut_returns_carousel_message(int size) {
         List<Map<String, String>> messages = MessageFixture.generate(size);
 
-        Message message = service.write(
-                messages,
-                null,
-                null,
-                null
-        );
+        UserConfiguration userConfiguration =
+                new UserConfiguration(
+                        messages,
+                        null,
+                        null,
+                        null,
+                        null
+                );
+        Message message = service.write(userConfiguration);
 
-        assertThat(message.getContent())
-                .as("should be CarouselContent")
-                .isInstanceOf(CarouselContent.class);
+        assertThat(message.getContent()).isInstanceOf(CarouselContent.class);
     }
 }

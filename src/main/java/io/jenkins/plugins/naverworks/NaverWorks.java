@@ -54,6 +54,7 @@ public class NaverWorks
     private final List<Map<String, String>> messages;
     private final String contentActionLabel;
     private final String contentActionLink;
+    private final String notification;
 
     @DataBoundConstructor
     public NaverWorks(
@@ -65,7 +66,9 @@ public class NaverWorks
             String channelId,
             List<Map<String, String>> messages,
             String contentActionLabel,
-            String contentActionLink) {
+            String contentActionLink,
+            String notification
+    ) {
         this.clientId = clientId;
         this.clientSecret = clientSecret;
         this.serviceAccount = serviceAccount;
@@ -75,6 +78,7 @@ public class NaverWorks
         this.messages = messages;
         this.contentActionLabel = contentActionLabel;
         this.contentActionLink = contentActionLink;
+        this.notification = notification;
     }
 
     public String getClientId() {
@@ -122,6 +126,10 @@ public class NaverWorks
         return contentActionLink;
     }
 
+    public String getNotification() {
+        return notification;
+    }
+
     @Override
     public String toString() {
         return "NaverWorks{" +
@@ -129,6 +137,7 @@ public class NaverWorks
                 ", messages=" + messages +
                 ", contentActionLabel='" + contentActionLabel + "'" +
                 ", contentActionLink='" + contentActionLink + "'" +
+                ", notification='" + notification + "'" +
                 '}';
     }
 
@@ -169,7 +178,15 @@ public class NaverWorks
 
         final Bot bot = new Bot(botId, channelId);
         final MessageService messageService = new NaverWorksMessageService();
-        final Message message = messageService.write(messages, backgroundImageUrl, contentActionLabel, actionLink);
+        final UserConfiguration userConfiguration =
+                new UserConfiguration(
+                        messages,
+                        backgroundImageUrl,
+                        contentActionLabel,
+                        actionLink,
+                        notification
+                );
+        final Message message = messageService.write(userConfiguration);
 
         logger.println("Send NAVER Works Messages...");
         String response = messageService.send(token, bot, message);
@@ -247,10 +264,6 @@ public class NaverWorks
 
         public FormValidation doCheckContentActionLabel(@QueryParameter String value) {
             return isBlank(value, "Content Action Label is required.");
-        }
-
-        public FormValidation doCheckContentActionLink(@QueryParameter String value) {
-            return isBlank(value, "Content Action Link is required.");
         }
 
         private FormValidation isBlank(String value, String message) {

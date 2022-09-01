@@ -20,7 +20,7 @@
 # target/naver-works.hpi
 ```
 
-## Upload
+### Upload
 
 > Manage Jenkins > Manage Plugins > Advanced > Deploy Plugin
 
@@ -44,16 +44,13 @@ stage('Notification') {
             backgroundImageUrl: env.NAVER_WORKS_BG_URL,
             botId: env.NAVER_WORKS_BOT_ID,
             channelId: env.NAVER_WORKS_CHANNEL_ID,
-            messages: issues,
             contentActionLabel: 'Go to Jenkins',
-            contentActionLink: env.BUILD_URL
+            contentActionLink: env.BUILD_URL,
+            // messages: issues // Optional
+            notification: 'Changes have been deployed.' // Optional
     )
 }
 ```
-
-![List Template](images/list-template-content.png)
-
-_NAVER Works 메시지_
 
 `Manage Jenkins > Configure System > Jenkins Location > Jenkins URL`
 구성은 별도로 설정하지 않았다면 기본적으로 `localhost`로 설정된다.
@@ -63,3 +60,26 @@ _NAVER Works 메시지_
 로컬 환경에서 테스트할 경우 `http://127.0.0.1:8080/jenkins/` 와 같이 Loopback 주소를 입력한다.
 
 ![Jenkins Location](images/jenkins-location.png)
+
+## Message Templates
+
+### Link
+
+[Link 메시지](https://developers.worksmobile.com/kr/reference/bot-send-link)는
+`messages` 가 비었거나 `notification` 을 보낼 경우 설정된다.
+
+![Link](images/link-content.png)
+
+### List Template
+
+[List Template 메시지](https://developers.worksmobile.com/kr/reference/bot-send-list)는
+`messages` 가 4개 이하일 경우 설정된다.
+
+![List Template](images/list-template-content.png)
+
+### Carousel
+
+[Carousel 메시지](https://developers.worksmobile.com/kr/reference/bot-send-carousel)는
+`messages` 가 4개를 넘을 경우 설정된다.
+
+![Carousel](images/carousel-content.png)
