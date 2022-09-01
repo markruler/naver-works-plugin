@@ -2,6 +2,7 @@ package io.jenkins.plugins.naverworks.bot;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jenkins.plugins.naverworks.RuntimeExceptionWrapper;
+import io.jenkins.plugins.naverworks.UserConfiguration;
 import io.jenkins.plugins.naverworks.auth.NaverWorksResponseHandler;
 import io.jenkins.plugins.naverworks.auth.Token;
 import io.jenkins.plugins.naverworks.bot.message.Action;
@@ -13,8 +14,8 @@ import io.jenkins.plugins.naverworks.bot.message.LinkMessage;
 import io.jenkins.plugins.naverworks.bot.message.ListTemplateContent;
 import io.jenkins.plugins.naverworks.bot.message.ListTemplateMessage;
 import io.jenkins.plugins.naverworks.bot.message.Message;
-import io.jenkins.plugins.naverworks.UserConfiguration;
-import org.apache.commons.lang.StringUtils;
+import io.jenkins.plugins.naverworks.bot.message.TextContent;
+import io.jenkins.plugins.naverworks.bot.message.TextMessage;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -27,6 +28,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 /**
  * 메시지를 Bot에 보낸다.
@@ -51,26 +55,23 @@ public class NaverWorksMessageService implements MessageService {
         String notification = parameter.getNotification();
 
         if (messages == null || messages.isEmpty()) {
-            if (StringUtils.isBlank(notification)) {
+            if (isBlank(notification)) {
                 notification = "Changes have been deployed.";
             }
-            LinkContent content =
-                    new LinkContent(
-                            notification,
-                            contentActionLabel,
-                            contentActionLink
-                    );
-            return new LinkMessage(content);
-        }
 
-        if (messages.size() == 1 && StringUtils.isBlank(backgroundImageUrl)) {
-            LinkContent content =
-                    new LinkContent(
-                            notification,
-                            contentActionLabel,
-                            contentActionLink
-                    );
-            return new LinkMessage(content);
+            if (isNotBlank(contentActionLabel)
+                    && isNotBlank(contentActionLink)
+                    && isBlank(backgroundImageUrl)) {
+                LinkContent content =
+                        new LinkContent(
+                                notification,
+                                contentActionLabel,
+                                contentActionLink
+                        );
+                return new LinkMessage(content);
+            }
+            TextContent content = new TextContent(notification);
+            return new TextMessage(content);
         }
 
         if (messages.size() <= maxListTemplateElements) {
