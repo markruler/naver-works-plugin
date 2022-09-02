@@ -37,17 +37,23 @@ stage('Notification') {
     ]
 
     naver(
+            // required parameters
             clientId: env.NAVER_WORKS_CLIENT_ID,
             clientSecret: env.NAVER_WORKS_CLIENT_SECRET,
             serviceAccount: env.NAVER_WORKS_SERVICE_ACCOUNT,
             credentialId: env.NAVER_WORKS_CREDENTIAL_ID,
-            backgroundImageUrl: env.NAVER_WORKS_BG_URL,
             botId: env.NAVER_WORKS_BOT_ID,
             channelId: env.NAVER_WORKS_CHANNEL_ID,
+            messageType: 'list_template',
+            // optional parameters
+            backgroundImageUrl: env.NAVER_WORKS_BG_URL,
             contentActionLabel: 'Go to Jenkins',
             contentActionLink: env.BUILD_URL,
-            // messages: issues // Optional
-            notification: 'Changes have been deployed.' // Optional
+            messages: issues,
+            notification: """${minute}분 뒤 'A'가 재시작됩니다.
+                          |
+                          |'A' will restart in ${minute} minutes.
+                          |""".stripMargin()
     )
 }
 ```
@@ -63,23 +69,34 @@ stage('Notification') {
 
 ## Message Templates
 
+### Text
+
+```groovy
+messageType: 'text'
+```
+
+![Text](images/text-content.png)
+
 ### Link
 
-[Link 메시지](https://developers.worksmobile.com/kr/reference/bot-send-link)는
-`messages` 가 비었거나 `notification` 을 보낼 경우 설정된다.
+```groovy
+messageType: 'link'
+```
 
 ![Link](images/link-content.png)
 
 ### List Template
 
-[List Template 메시지](https://developers.worksmobile.com/kr/reference/bot-send-list)는
-`messages` 가 4개 이하일 경우 설정된다.
+```groovy
+messageType: 'list_template'
+```
 
 ![List Template](images/list-template-content.png)
 
 ### Carousel
 
-[Carousel 메시지](https://developers.worksmobile.com/kr/reference/bot-send-carousel)는
-`messages` 가 4개를 넘을 경우 설정된다.
+```groovy
+messageType: 'carousel'
+```
 
 ![Carousel](images/carousel-content.png)

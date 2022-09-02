@@ -5,7 +5,7 @@ public class TextContent implements Content {
     /**
      * 메시지 유형
      */
-    private static final String type = "text";
+    public static final String TYPE = "text";
 
     /**
      * 메시지 본문
@@ -18,7 +18,7 @@ public class TextContent implements Content {
 
     @Override
     public String getType() {
-        return type;
+        return TYPE;
     }
 
     public String getText() {

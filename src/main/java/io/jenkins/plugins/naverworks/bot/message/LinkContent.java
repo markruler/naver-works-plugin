@@ -1,10 +1,11 @@
 package io.jenkins.plugins.naverworks.bot.message;
 
 public class LinkContent implements Content {
+
     /**
      * 메시지 유형
      */
-    private static final String type = "link";
+    public static final String TYPE = "link";
 
     /**
      * 메시지 본문
@@ -29,7 +30,7 @@ public class LinkContent implements Content {
 
     @Override
     public String getType() {
-        return type;
+        return TYPE;
     }
 
     public String getContentText() {

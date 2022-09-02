@@ -9,6 +9,8 @@ import io.jenkins.plugins.naverworks.bot.message.Message;
 import io.jenkins.plugins.naverworks.bot.message.MessageFixture;
 import io.jenkins.plugins.naverworks.bot.message.TextContent;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -19,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class NaverWorksMessageServiceTest {
 
-    final int maxListTemplateContent = 4;
     static NaverWorksMessageService service;
 
     @BeforeAll
@@ -27,134 +28,177 @@ class NaverWorksMessageServiceTest {
         service = new NaverWorksMessageService();
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = 0)
-    void if_message_is_empty_sut_returns_text_message(int size) {
+    @Nested
+    @DisplayName("TextMessage는")
+    class Describe_TextMessage {
 
-        List<Map<String, String>> messages = MessageFixture.generate(size);
-        String backgroundImageUrl = null;
-        String contentActionLabel = null;
-        String contentActionLink = null;
-        String notification = null;
-        String contentType = null;
+        @Nested
+        @DisplayName("notification이 비어 있다면")
+        class Context_notification_is_empty {
 
-        UserConfiguration userConfiguration =
-                new UserConfiguration(
-                        messages,
-                        backgroundImageUrl,
-                        contentActionLabel,
-                        contentActionLink,
-                        notification,
-                        contentType
-                );
-        Message message = service.write(userConfiguration);
+            @ParameterizedTest
+            @ValueSource(strings = TextContent.TYPE)
+            @DisplayName("기본 메시지를 출력한다")
+            void message_type_text(String messageType) {
 
-        Content content = message.getContent();
-        assertThat(content).isInstanceOf(TextContent.class);
-        assertThat(((TextContent) content).getText()).isEqualTo("Changes have been deployed.");
+                int size = 0;
+                List<Map<String, String>> messages = MessageFixture.generate(size);
+                String backgroundImageUrl = null;
+                String contentActionLabel = null;
+                String contentActionLink = null;
+                String notification = null;
+
+                UserConfiguration userConfiguration =
+                        new UserConfiguration(
+                                messages,
+                                backgroundImageUrl,
+                                contentActionLabel,
+                                contentActionLink,
+                                notification,
+                                messageType
+                        );
+                Message message = service.write(userConfiguration);
+
+                Content content = message.getContent();
+                assertThat(content).isInstanceOf(TextContent.class);
+                assertThat(((TextContent) content).getText()).isEqualTo("Changes have been deployed.");
+            }
+        }
+
+        @Nested
+        @DisplayName("notification이 있다면")
+        class Context_notification_is_not_empty {
+
+            @ParameterizedTest
+            @ValueSource(strings = TextContent.TYPE)
+            @DisplayName("notifiaction을 출력한다")
+            void if_text_message_has_notification_sut_returns_notification(String messageType) {
+
+                int size = 0;
+                List<Map<String, String>> messages = MessageFixture.generate(size);
+                String backgroundImageUrl = null;
+                String contentActionLabel = null;
+                String contentActionLink = null;
+                String notification = "Notify";
+
+                UserConfiguration userConfiguration =
+                        new UserConfiguration(
+                                messages,
+                                backgroundImageUrl,
+                                contentActionLabel,
+                                contentActionLink,
+                                notification,
+                                messageType
+                        );
+                Message message = service.write(userConfiguration);
+
+                Content content = message.getContent();
+                assertThat(content).isInstanceOf(TextContent.class);
+                assertThat(((TextContent) content).getText()).isEqualTo(notification);
+            }
+        }
+
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = 0)
-    void if_message_is_empty_but_notification_exists_sut_returns_text_message(int size) {
 
-        List<Map<String, String>> messages = MessageFixture.generate(size);
-        String backgroundImageUrl = null;
-        String contentActionLabel = null;
-        String contentActionLink = null;
-        String notification = "Notify";
-        String contentType = null;
+    @Nested
+    @DisplayName("LinkMessage는")
+    class Describe_LinkMessage {
 
-        UserConfiguration userConfiguration =
-                new UserConfiguration(
-                        messages,
-                        backgroundImageUrl,
-                        contentActionLabel,
-                        contentActionLink,
-                        notification,
-                        contentType
-                );
-        Message message = service.write(userConfiguration);
+        @Nested
+        @DisplayName("notification이 있다면")
+        class Context_notification_is_not_empty {
 
-        Content content = message.getContent();
-        assertThat(content).isInstanceOf(TextContent.class);
-        assertThat(((TextContent) content).getText()).isEqualTo(notification);
+            @ParameterizedTest
+            @ValueSource(strings = LinkContent.TYPE)
+            @DisplayName("notification을 출력한다")
+            void message_type_link(String messageType) {
+
+                int size = 0;
+                List<Map<String, String>> messages = MessageFixture.generate(size);
+                String backgroundImageUrl = null;
+                String contentActionLabel = "Go to Jenkins";
+                String contentActionLink = "https://www.jenkins.io/";
+                String notification = "Notify";
+
+                UserConfiguration userConfiguration =
+                        new UserConfiguration(
+                                messages,
+                                backgroundImageUrl,
+                                contentActionLabel,
+                                contentActionLink,
+                                notification,
+                                messageType
+                        );
+                Message message = service.write(userConfiguration);
+
+                Content content = message.getContent();
+                assertThat(content).isInstanceOf(LinkContent.class);
+                assertThat(((LinkContent) content).getContentText()).isEqualTo(notification);
+            }
+        }
+
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = 0)
-    void if_message_is_empty_but_content_link_exists_sut_returns_link_message(int size) {
+    @Nested
+    @DisplayName("ListTemplateMessage는")
+    class Describe_ListTemplate {
 
-        List<Map<String, String>> messages = MessageFixture.generate(size);
-        String backgroundImageUrl = null;
-        String contentActionLabel = "Go to Jenkins";
-        String contentActionLink = "https://www.jenkins.io/";
-        String notification = "Notify";
-        String contentType = null;
+        @ParameterizedTest
+        @ValueSource(strings = ListTemplateContent.TYPE)
+        @DisplayName("messageType이 list_template일 경우 생성된다")
+        void message_type_list_template(String messageType) {
 
-        UserConfiguration userConfiguration =
-                new UserConfiguration(
-                        messages,
-                        backgroundImageUrl,
-                        contentActionLabel,
-                        contentActionLink,
-                        notification,
-                        contentType
-                );
-        Message message = service.write(userConfiguration);
+            int size = 4;
+            List<Map<String, String>> messages = MessageFixture.generate(size);
+            String backgroundImageUrl = null;
+            String contentActionLabel = null;
+            String contentActionLink = null;
+            String notification = null;
 
-        Content content = message.getContent();
-        assertThat(content).isInstanceOf(LinkContent.class);
-        assertThat(((LinkContent) content).getContentText()).isEqualTo(notification);
+            UserConfiguration userConfiguration =
+                    new UserConfiguration(
+                            messages,
+                            backgroundImageUrl,
+                            contentActionLabel,
+                            contentActionLink,
+                            notification,
+                            messageType
+                    );
+            Message message = service.write(userConfiguration);
+
+            assertThat(message.getContent()).isInstanceOf(ListTemplateContent.class);
+        }
     }
 
-    @ParameterizedTest
-    @ValueSource(ints = maxListTemplateContent)
-    void if_messages_size_is_list_template_size_sut_returns_list_template_message(int size) {
+    @Nested
+    @DisplayName("CarouselMessage는")
+    class Describe_CarouselMessage {
 
-        List<Map<String, String>> messages = MessageFixture.generate(size);
-        String backgroundImageUrl = null;
-        String contentActionLabel = null;
-        String contentActionLink = null;
-        String notification = null;
-        String contentType = null;
+        @ParameterizedTest
+        @ValueSource(strings = CarouselContent.TYPE)
+        @DisplayName("messageType이 carousel일 경우 생성된다")
+        void message_type_carousel(String messageType) {
 
-        UserConfiguration userConfiguration =
-                new UserConfiguration(
-                        messages,
-                        backgroundImageUrl,
-                        contentActionLabel,
-                        contentActionLink,
-                        notification,
-                        contentType
-                );
-        Message message = service.write(userConfiguration);
+            int size = 5;
+            List<Map<String, String>> messages = MessageFixture.generate(size);
+            String backgroundImageUrl = null;
+            String contentActionLabel = null;
+            String contentActionLink = null;
+            String notification = null;
 
-        assertThat(message.getContent()).isInstanceOf(ListTemplateContent.class);
-    }
+            UserConfiguration userConfiguration =
+                    new UserConfiguration(
+                            messages,
+                            backgroundImageUrl,
+                            contentActionLabel,
+                            contentActionLink,
+                            notification,
+                            messageType
+                    );
+            Message message = service.write(userConfiguration);
 
-    @ParameterizedTest
-    @ValueSource(ints = maxListTemplateContent + 1)
-    void if_messages_size_is_more_than_list_template_size_sut_returns_carousel_message(int size) {
-
-        List<Map<String, String>> messages = MessageFixture.generate(size);
-        String backgroundImageUrl = null;
-        String contentActionLabel = null;
-        String contentActionLink = null;
-        String notification = null;
-        String contentType = null;
-
-        UserConfiguration userConfiguration =
-                new UserConfiguration(
-                        messages,
-                        backgroundImageUrl,
-                        contentActionLabel,
-                        contentActionLink,
-                        notification,
-                        contentType
-                );
-        Message message = service.write(userConfiguration);
-
-        assertThat(message.getContent()).isInstanceOf(CarouselContent.class);
+            assertThat(message.getContent()).isInstanceOf(CarouselContent.class);
+        }
     }
 }

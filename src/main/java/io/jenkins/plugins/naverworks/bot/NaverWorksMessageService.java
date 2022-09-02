@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 /**
  * 메시지를 Bot에 보낸다.
@@ -45,83 +44,56 @@ public class NaverWorksMessageService implements MessageService {
 
     @Override
     public Message write(UserConfiguration userConfiguration) {
-
-        final List<Map<String, String>> messages = userConfiguration.getMessages();
-        final String backgroundImageUrl = userConfiguration.getBackgroundImageUrl();
-        final String contentActionLabel = userConfiguration.getContentActionLabel();
-        final String contentActionLink = userConfiguration.getContentActionLink();
-        String notification = userConfiguration.getNotification();
-
-        // FIXME: `type` parameter is required.
-        final String type = userConfiguration.getContentType();
-        if (isNotBlank(type)) {
-            return writeTemplateMessage(userConfiguration);
+        final String type = userConfiguration.getMessageType();
+        if (isBlank(type)) {
+            throw new MessageTypeNotFound("messageType is empty");
         }
-
-        final int maxListTemplateElements = 4;
-        if (messages == null || messages.isEmpty()) {
-            if (isBlank(notification)) {
-                notification = "Changes have been deployed.";
-            }
-
-            if (isNotBlank(contentActionLabel) && isNotBlank(contentActionLink)) {
-                LinkContent content =
-                        new LinkContent(
-                                notification,
-                                contentActionLabel,
-                                contentActionLink
-                        );
-                return new LinkMessage(content);
-            }
-            TextContent content = new TextContent(notification);
-            return new TextMessage(content);
-        }
-
-        if (messages.size() <= maxListTemplateElements) {
-            ListTemplateContent content = new ListTemplateContent();
-            content.setCoverData(new CoverData(backgroundImageUrl));
-            content.setMessages(messages);
-            Action action = new Action("uri", contentActionLabel, contentActionLink);
-            content.setActions(Collections.singletonList(action));
-
-            return new ListTemplateMessage(content);
-        }
-
-        CarouselContent content = new CarouselContent();
-        content.setMessages(messages, backgroundImageUrl, contentActionLink);
-        return new CarouselMessage(content);
+        return writeTemplateMessage(userConfiguration);
     }
 
+    /**
+     * type별 메시지를 만든다.
+     *
+     * @param userConfiguration 사용자 설정
+     * @return 메시지
+     */
     private Message writeTemplateMessage(UserConfiguration userConfiguration) {
 
         final List<Map<String, String>> messages = userConfiguration.getMessages();
         final String backgroundImageUrl = userConfiguration.getBackgroundImageUrl();
         final String contentActionLabel = userConfiguration.getContentActionLabel();
         final String contentActionLink = userConfiguration.getContentActionLink();
+        String messageType = userConfiguration.getMessageType();
         String notification = userConfiguration.getNotification();
-        String contentType = userConfiguration.getContentType();
+        if (isBlank(notification)) {
+            notification = "Changes have been deployed.";
+        }
 
-        switch (contentType) {
-            case "text":
+        switch (messageType) {
+
+            case TextContent.TYPE:
                 TextContent textContent = new TextContent(notification);
                 return new TextMessage(textContent);
-            case "link":
+
+            case LinkContent.TYPE:
                 LinkContent linkContent = new LinkContent(notification, contentActionLabel, contentActionLink);
                 return new LinkMessage(linkContent);
-            case "list-template":
+
+            case ListTemplateContent.TYPE:
                 ListTemplateContent listTemplateContent = new ListTemplateContent();
                 listTemplateContent.setMessages(messages);
                 listTemplateContent.setCoverData(new CoverData(backgroundImageUrl));
                 Action action = new Action("uri", "more", contentActionLink);
                 listTemplateContent.setActions(Collections.singletonList(action));
                 return new ListTemplateMessage(listTemplateContent);
-            case "carousel":
+
+            case CarouselContent.TYPE:
                 CarouselContent carouselContent = new CarouselContent();
                 carouselContent.setMessages(messages, backgroundImageUrl, contentActionLink);
                 return new CarouselMessage(carouselContent);
+
             default:
-                TextContent defaultContent = new TextContent("Changes have been deployed.");
-                return new TextMessage(defaultContent);
+                throw new MessageTypeNotFound("messageType not found");
         }
     }
 

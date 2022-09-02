@@ -7,14 +7,19 @@ import java.util.List;
 import java.util.Map;
 
 public class ListTemplateContent implements Content {
-    private static final String type = "list_template";
+
+    /**
+     * 메시지 유형
+     */
+    public static final String TYPE = "list_template";
+
     private CoverData coverData;
     private List<Element> elements;
     private List<List<Action>> actions;
 
     @Override
     public String getType() {
-        return type;
+        return TYPE;
     }
 
     public CoverData getCoverData() {
