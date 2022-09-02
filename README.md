@@ -72,7 +72,21 @@ stage('Notification') {
 ### Text
 
 ```groovy
-messageType: 'text'
+naver(
+        // required parameters
+        clientId: env.NAVER_WORKS_CLIENT_ID,
+        clientSecret: env.NAVER_WORKS_CLIENT_SECRET,
+        serviceAccount: env.NAVER_WORKS_SERVICE_ACCOUNT,
+        credentialId: env.NAVER_WORKS_CREDENTIAL_ID,
+        botId: env.NAVER_WORKS_BOT_ID,
+        channelId: env.NAVER_WORKS_CHANNEL_ID,
+        messageType: 'text',
+        // optional parameters
+        notification: """${minute}분 뒤 'A'가 재시작됩니다.
+                      |
+                      |'A' will restart in ${minute} minutes.
+                      |""".stripMargin()
+)
 ```
 
 ![Text](images/text-content.png)
@@ -80,7 +94,21 @@ messageType: 'text'
 ### Link
 
 ```groovy
-messageType: 'link'
+naver(
+        // required parameters
+        clientId: env.NAVER_WORKS_CLIENT_ID,
+        clientSecret: env.NAVER_WORKS_CLIENT_SECRET,
+        serviceAccount: env.NAVER_WORKS_SERVICE_ACCOUNT,
+        credentialId: env.NAVER_WORKS_CREDENTIAL_ID,
+        botId: env.NAVER_WORKS_BOT_ID,
+        channelId: env.NAVER_WORKS_CHANNEL_ID,
+        messageType: 'link',
+        // optional parameters
+        backgroundImageUrl: env.NAVER_WORKS_BG_URL,
+        contentActionLabel: 'Go to Jenkins',
+        contentActionLink: env.BUILD_URL,
+        notification: 'Changes have been deployed.'
+)
 ```
 
 ![Link](images/link-content.png)
@@ -88,7 +116,26 @@ messageType: 'link'
 ### List Template
 
 ```groovy
-messageType: 'list_template'
+List issues = [
+        [link: "https://jira.markruler.com/browse/MARK-31", title: "MARK-31", subtitle: "Jira Issue 31"],
+        [link: "https://jira.markruler.com/browse/MARK-32", title: "MARK-32", subtitle: "Jira Issue 32"]
+]
+
+naver(
+        // required parameters
+        clientId: env.NAVER_WORKS_CLIENT_ID,
+        clientSecret: env.NAVER_WORKS_CLIENT_SECRET,
+        serviceAccount: env.NAVER_WORKS_SERVICE_ACCOUNT,
+        credentialId: env.NAVER_WORKS_CREDENTIAL_ID,
+        botId: env.NAVER_WORKS_BOT_ID,
+        channelId: env.NAVER_WORKS_CHANNEL_ID,
+        messageType: 'list_template',
+        // optional parameters
+        backgroundImageUrl: env.NAVER_WORKS_BG_URL,
+        contentActionLabel: 'Go to Jenkins',
+        contentActionLink: env.BUILD_URL,
+        messages: issues
+)
 ```
 
 ![List Template](images/list-template-content.png)
@@ -96,7 +143,27 @@ messageType: 'list_template'
 ### Carousel
 
 ```groovy
-messageType: 'carousel'
+List issues = [
+        [link: "https://jira.markruler.com/browse/MARK-1", title: "MARK-1", subtitle: "not null"],
+        [link: "https://jira.markruler.com/browse/MARK-2", title: "MARK-2", subtitle: "subtitle2"],
+        [link: "https://www.jenkins.io/", title: "title-3", subtitle: "subtitle3"]
+]
+
+naver(
+        // required parameters
+        clientId: env.NAVER_WORKS_CLIENT_ID,
+        clientSecret: env.NAVER_WORKS_CLIENT_SECRET,
+        serviceAccount: env.NAVER_WORKS_SERVICE_ACCOUNT,
+        credentialId: env.NAVER_WORKS_CREDENTIAL_ID,
+        botId: env.NAVER_WORKS_BOT_ID,
+        channelId: env.NAVER_WORKS_CHANNEL_ID,
+        messageType: 'carousel',
+        // optional parameters
+        backgroundImageUrl: env.NAVER_WORKS_BG_URL,
+        contentActionLabel: 'Go to Jenkins',
+        contentActionLink: env.BUILD_URL,
+        messages: issues
+)
 ```
 
 ![Carousel](images/carousel-content.png)
