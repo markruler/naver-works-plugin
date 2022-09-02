@@ -2,29 +2,23 @@
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
 
     <f:section title="App">
-        <f:entry field="clientId" title="Client ID">
-            <f:textbox/>
-        </f:entry>
-        <f:entry field="clientSecret" title="Client Secret">
-            <f:textbox/>
-        </f:entry>
-        <f:entry field="serviceAccount" title="Service Account">
-            <f:textbox/>
-        </f:entry>
         <f:entry field="credentialId" title="Credential ID">
             <c:select/>
         </f:entry>
-        <f:entry field="backgroundImageUrl" title="Background Image URL">
-            <f:textbox placeholder="https://markruler.github.io/images/master/markruler-wave.png"/>
-        </f:entry>
-    </f:section>
-
-    <f:section title="Message">
         <f:entry field="botId" title="Bot ID">
             <f:textbox/>
         </f:entry>
         <f:entry field="channelId" title="Channel ID">
             <f:textbox/>
+        </f:entry>
+        <f:entry field="messageType" title="Message Type">
+            <f:textbox placeholder="text,link,list_template,carousel"/>
+        </f:entry>
+    </f:section>
+
+    <f:section title="Message">
+        <f:entry field="backgroundImageUrl" title="Background Image URL">
+            <f:textbox placeholder="https://www.jenkins.io/images/logos/parasite/parasite.png"/>
         </f:entry>
         <f:entry field="contentActionLabel" title="Content Action Label">
             <f:textbox placeholder="Go to Jenkins"/>

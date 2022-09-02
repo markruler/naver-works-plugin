@@ -2,9 +2,10 @@ package io.jenkins.plugins.naverworks.auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import io.jenkins.plugins.naverworks.App;
-import org.junit.Before;
-import org.junit.Test;
+import com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey;
+import com.cloudbees.plugins.credentials.CredentialsScope;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.security.GeneralSecurityException;
 import java.security.spec.InvalidKeySpecException;
@@ -12,7 +13,7 @@ import java.security.spec.InvalidKeySpecException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class NaverWorksAuthTest {
+class NaverWorksAuthTest {
 
     // ssh-keygen -m pkcs8 -f test.pem -N ""
     final String pkcs8EncodedPrivateKey = "-----BEGIN PRIVATE KEY-----\n" +
@@ -60,15 +61,26 @@ public class NaverWorksAuthTest {
     private final String subject = "sa";
     private NaverWorksAuth auth;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         auth = new NaverWorksAuth();
     }
 
     @Test
-    public void generate_jwt() throws GeneralSecurityException {
-        App app = new App(issuer, "secret", subject, pkcs8EncodedPrivateKey);
-        String jwt = auth.generateJwtWithServiceAccount(app);
+    void generate_jwt() throws GeneralSecurityException {
+        NaverWorksCredential credential =
+                new NaverWorksCredential(
+                        CredentialsScope.GLOBAL,
+                        "credential-id",
+                        null,
+                        new BasicSSHUserPrivateKey.DirectEntryPrivateKeySource(pkcs8EncodedPrivateKey),
+                        null,
+                        null,
+                        issuer,
+                        "clinet-secret",
+                        subject
+                );
+        String jwt = auth.generateJwtWithServiceAccount(credential);
         DecodedJWT decodedJWT = JWT.decode(jwt);
 
         // https://developers.worksmobile.com/kr/reference/authorization-sa
@@ -80,10 +92,21 @@ public class NaverWorksAuthTest {
     }
 
     @Test
-    public void throws_invalid_key_spec_exception() {
-        App app = new App(issuer, "secret", subject, "invalid private Key");
+    void throws_invalid_key_spec_exception() {
+        NaverWorksCredential credential =
+                new NaverWorksCredential(
+                        CredentialsScope.GLOBAL,
+                        "credential-id",
+                        null,
+                        null,
+                        null,
+                        null,
+                        "client-id",
+                        "clinet-secret",
+                        "service-account"
+                );
 
-        assertThatThrownBy(() -> auth.generateJwtWithServiceAccount(app))
+        assertThatThrownBy(() -> auth.generateJwtWithServiceAccount(credential))
                 .isInstanceOf(InvalidKeySpecException.class);
     }
 

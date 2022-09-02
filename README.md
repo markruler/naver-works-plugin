@@ -26,6 +26,15 @@
 
 ![Deploy Plugin](images/deploy-plugin.png)
 
+## Add Credentials
+
+[NAVER Works Developer Console](https://developers.worksmobile.com/kr/console/openapi/v2/app/list/view)에서
+앱 정보를 추가하고, Jenkins애서 Credential을 추가한다.
+
+![NAVER Works App](images/naver-works-client-app.png)
+
+![NAVER Works Credential](images/naver-works-credential.png)
+
 ## Pipeline
 
 ```groovy
@@ -38,10 +47,7 @@ stage('Notification') {
 
     naver(
             // required parameters
-            clientId: env.NAVER_WORKS_CLIENT_ID,
-            clientSecret: env.NAVER_WORKS_CLIENT_SECRET,
-            serviceAccount: env.NAVER_WORKS_SERVICE_ACCOUNT,
-            credentialId: env.NAVER_WORKS_CREDENTIAL_ID,
+            credentialId: 'naver-works-credential',
             botId: env.NAVER_WORKS_BOT_ID,
             channelId: env.NAVER_WORKS_CHANNEL_ID,
             messageType: 'list_template',
@@ -74,10 +80,7 @@ stage('Notification') {
 ```groovy
 naver(
         // required parameters
-        clientId: env.NAVER_WORKS_CLIENT_ID,
-        clientSecret: env.NAVER_WORKS_CLIENT_SECRET,
-        serviceAccount: env.NAVER_WORKS_SERVICE_ACCOUNT,
-        credentialId: env.NAVER_WORKS_CREDENTIAL_ID,
+        credentialId: 'naver-works-credential',
         botId: env.NAVER_WORKS_BOT_ID,
         channelId: env.NAVER_WORKS_CHANNEL_ID,
         messageType: 'text',
@@ -96,10 +99,7 @@ naver(
 ```groovy
 naver(
         // required parameters
-        clientId: env.NAVER_WORKS_CLIENT_ID,
-        clientSecret: env.NAVER_WORKS_CLIENT_SECRET,
-        serviceAccount: env.NAVER_WORKS_SERVICE_ACCOUNT,
-        credentialId: env.NAVER_WORKS_CREDENTIAL_ID,
+        credentialId: 'naver-works-credential',
         botId: env.NAVER_WORKS_BOT_ID,
         channelId: env.NAVER_WORKS_CHANNEL_ID,
         messageType: 'link',
@@ -123,10 +123,7 @@ List issues = [
 
 naver(
         // required parameters
-        clientId: env.NAVER_WORKS_CLIENT_ID,
-        clientSecret: env.NAVER_WORKS_CLIENT_SECRET,
-        serviceAccount: env.NAVER_WORKS_SERVICE_ACCOUNT,
-        credentialId: env.NAVER_WORKS_CREDENTIAL_ID,
+        credentialId: 'naver-works-credential',
         botId: env.NAVER_WORKS_BOT_ID,
         channelId: env.NAVER_WORKS_CHANNEL_ID,
         messageType: 'list_template',
@@ -151,10 +148,7 @@ List issues = [
 
 naver(
         // required parameters
-        clientId: env.NAVER_WORKS_CLIENT_ID,
-        clientSecret: env.NAVER_WORKS_CLIENT_SECRET,
-        serviceAccount: env.NAVER_WORKS_SERVICE_ACCOUNT,
-        credentialId: env.NAVER_WORKS_CREDENTIAL_ID,
+        credentialId: 'naver-works-credential',
         botId: env.NAVER_WORKS_BOT_ID,
         channelId: env.NAVER_WORKS_CHANNEL_ID,
         messageType: 'carousel',

@@ -20,6 +20,7 @@ import hudson.tasks.Builder;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import io.jenkins.plugins.naverworks.auth.NaverWorksAuth;
+import io.jenkins.plugins.naverworks.auth.NaverWorksCredential;
 import io.jenkins.plugins.naverworks.auth.Token;
 import io.jenkins.plugins.naverworks.bot.Bot;
 import io.jenkins.plugins.naverworks.bot.MessageService;
@@ -44,9 +45,6 @@ public class NaverWorks
         extends Builder
         implements SimpleBuildStep {
 
-    private final String clientId;
-    private final String clientSecret;
-    private final String serviceAccount;
     private final String credentialId;
     private final String botId;
     private final String channelId;
@@ -59,9 +57,6 @@ public class NaverWorks
 
     @DataBoundConstructor
     public NaverWorks(
-            String clientId,
-            String clientSecret,
-            String serviceAccount,
             String credentialId,
             String botId,
             String channelId,
@@ -71,9 +66,6 @@ public class NaverWorks
             String notification,
             String messageType
     ) {
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.serviceAccount = serviceAccount;
         this.credentialId = credentialId;
         this.botId = botId;
         this.channelId = channelId;
@@ -82,18 +74,6 @@ public class NaverWorks
         this.contentActionLink = contentActionLink;
         this.notification = notification;
         this.messageType = messageType;
-    }
-
-    public String getClientId() {
-        return clientId;
-    }
-
-    public String getClientSecret() {
-        return clientSecret;
-    }
-
-    public String getServiceAccount() {
-        return serviceAccount;
     }
 
     public String getCredentialId() {
@@ -159,10 +139,10 @@ public class NaverWorks
             throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
 
-        BasicSSHUserPrivateKey credential =
+        NaverWorksCredential credential =
                 CredentialsProvider.findCredentialById(
                         credentialId,
-                        BasicSSHUserPrivateKey.class,
+                        NaverWorksCredential.class,
                         run,
                         (DomainRequirement) null);
 
@@ -177,12 +157,9 @@ public class NaverWorks
             throw new PrivateKeyCredentialsNotFoundException("Credential not found.");
         }
 
-        final List<String> privateKeys = credential.getPrivateKeys();
-        final App app = new App(clientId, clientSecret, serviceAccount, privateKeys.get(0));
-        final NaverWorksAuth auth = new NaverWorksAuth();
         logger.println("Issue NAVER Works Token...");
-        Token token = auth.requestNaverWorksToken(app);
-
+        final NaverWorksAuth auth = new NaverWorksAuth();
+        Token token = auth.requestNaverWorksToken(credential);
 
         final Bot bot = new Bot(botId, channelId);
         final MessageService messageService = new NaverWorksMessageService();
@@ -202,7 +179,7 @@ public class NaverWorks
 
         if (response.equals(String.valueOf(HttpStatus.SC_FORBIDDEN))) {
             // one more try
-            token = auth.requestNaverWorksToken(app);
+            token = auth.requestNaverWorksToken(credential);
             response = messageService.send(token, bot, message);
             logger.println("Retry response..." + response);
         }
@@ -246,18 +223,6 @@ public class NaverWorks
                     );
         }
 
-        public FormValidation doCheckClientId(@QueryParameter String value) {
-            return isBlank(value, "Client ID is required.");
-        }
-
-        public FormValidation doCheckClientSecret(@QueryParameter String value) {
-            return isBlank(value, "Client Secret is required.");
-        }
-
-        public FormValidation doCheckServiceAccount(@QueryParameter String value) {
-            return isBlank(value, "Service Account is required.");
-        }
-
         public FormValidation doCheckCredentialId(@QueryParameter String value) {
             return isBlank(value, "Credential ID is required.");
         }
@@ -270,8 +235,8 @@ public class NaverWorks
             return isBlank(value, "Channel ID is required.");
         }
 
-        public FormValidation doCheckContentActionLabel(@QueryParameter String value) {
-            return isBlank(value, "Content Action Label is required.");
+        public FormValidation doCheckMessageType(@QueryParameter String value) {
+            return isBlank(value, "Message Type is required.");
         }
 
         private FormValidation isBlank(String value, String message) {
