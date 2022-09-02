@@ -94,6 +94,11 @@
             <version>3.23.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.github.javaunit</groupId>
+            <artifactId>autoparams</artifactId>
+            <version>0.3.1</version>
+        </dependency>
 
         <!-- RSA Credential -->
         <dependency>
