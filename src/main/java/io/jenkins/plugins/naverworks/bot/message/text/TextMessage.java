@@ -1,4 +1,7 @@
-package io.jenkins.plugins.naverworks.bot.message;
+package io.jenkins.plugins.naverworks.bot.message.text;
+
+import io.jenkins.plugins.naverworks.bot.message.Content;
+import io.jenkins.plugins.naverworks.bot.message.Message;
 
 /**
  * Message - Text
@@ -7,6 +10,9 @@ package io.jenkins.plugins.naverworks.bot.message;
  */
 public class TextMessage implements Message {
 
+    /**
+     * 메시지 내용
+     */
     private final Content content;
 
     public TextMessage(Content content) {

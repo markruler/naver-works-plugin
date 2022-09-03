@@ -11,4 +11,5 @@ public interface Content {
      * @return 메시지 유형
      */
     String getType();
+
 }

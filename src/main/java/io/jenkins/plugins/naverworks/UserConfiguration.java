@@ -3,6 +3,9 @@ package io.jenkins.plugins.naverworks;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 사용자 설정 파라미터
+ */
 public class UserConfiguration {
 
     private final List<Map<String, String>> messages;

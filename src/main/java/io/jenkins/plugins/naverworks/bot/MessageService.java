@@ -21,6 +21,7 @@ public interface MessageService {
      * @param bot     NAVER Works 메신저 Bot
      * @param message 전송할 메시지
      * @return API 응답 메시지
+     * @see <a href="https://developers.worksmobile.com/kr/reference/bot-channel-message-send?lang=ko">메시지 전송 - 채널 대상</a>
      */
     String send(final Token token, final Bot bot, final Message message);
 }

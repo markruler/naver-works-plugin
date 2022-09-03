@@ -2,6 +2,8 @@ package io.jenkins.plugins.naverworks.bot.message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jenkins.plugins.naverworks.bot.message.carousel.CarouselContent;
+import io.jenkins.plugins.naverworks.bot.message.carousel.Column;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

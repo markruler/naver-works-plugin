@@ -1,20 +1,34 @@
 package io.jenkins.plugins.naverworks.bot.message;
 
 /**
- * Action Object
+ * Action Object - URI Action
  *
- * @see <a href="https://developers.worksmobile.com/kr/reference/bot-actionobject">Actions Objects</a>
+ * @see <a href="https://developers.worksmobile.com/kr/reference/bot-actionobject?lang=ko#uri-action">Actions Objects</a>
  */
 public class Action {
-    private String type;
-    private String label;
-    private String uri;
 
-    public Action() {
+    /**
+     * uri로 고정
+     */
+    private final String type = "uri";
+
+    /**
+     * 항목에 표시되는 레이블
+     */
+    private final String label;
+
+    /**
+     * 항목을 누를 때 접속할 URI
+     */
+    private final String uri;
+
+    public Action(String label, String uri) {
+        this.label = label;
+        this.uri = uri;
     }
 
-    public Action(String type, String label, String uri) {
-        this.type = type;
+    @Deprecated
+    public Action(@SuppressWarnings("unused") String ignore, String label, String uri) {
         this.label = label;
         this.uri = uri;
     }
@@ -23,23 +37,12 @@ public class Action {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public String getLabel() {
         return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     public String getUri() {
         return uri;
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
 }

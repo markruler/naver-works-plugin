@@ -1,5 +1,12 @@
-package io.jenkins.plugins.naverworks.bot.message;
+package io.jenkins.plugins.naverworks.bot.message.link;
 
+import io.jenkins.plugins.naverworks.bot.message.Content;
+
+/**
+ * Link - Request content
+ *
+ * @see <a href="https://developers.worksmobile.com/kr/reference/bot-send-link?lang=ko#request-content">Link</a>
+ */
 public class LinkContent implements Content {
 
     /**

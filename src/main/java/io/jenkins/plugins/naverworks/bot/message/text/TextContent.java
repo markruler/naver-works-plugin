@@ -1,4 +1,6 @@
-package io.jenkins.plugins.naverworks.bot.message;
+package io.jenkins.plugins.naverworks.bot.message.text;
+
+import io.jenkins.plugins.naverworks.bot.message.Content;
 
 public class TextContent implements Content {
 

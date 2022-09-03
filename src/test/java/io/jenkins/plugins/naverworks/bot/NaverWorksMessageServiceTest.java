@@ -1,13 +1,13 @@
 package io.jenkins.plugins.naverworks.bot;
 
 import io.jenkins.plugins.naverworks.UserConfiguration;
-import io.jenkins.plugins.naverworks.bot.message.CarouselContent;
+import io.jenkins.plugins.naverworks.bot.message.carousel.CarouselContent;
 import io.jenkins.plugins.naverworks.bot.message.Content;
-import io.jenkins.plugins.naverworks.bot.message.LinkContent;
-import io.jenkins.plugins.naverworks.bot.message.ListTemplateContent;
+import io.jenkins.plugins.naverworks.bot.message.link.LinkContent;
+import io.jenkins.plugins.naverworks.bot.message.list.ListTemplateContent;
 import io.jenkins.plugins.naverworks.bot.message.Message;
 import io.jenkins.plugins.naverworks.bot.message.MessageFixture;
-import io.jenkins.plugins.naverworks.bot.message.TextContent;
+import io.jenkins.plugins.naverworks.bot.message.text.TextContent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

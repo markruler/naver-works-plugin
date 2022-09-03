@@ -1,8 +1,11 @@
-package io.jenkins.plugins.naverworks.bot.message;
+package io.jenkins.plugins.naverworks.bot.message.carousel;
+
+import io.jenkins.plugins.naverworks.bot.message.Action;
 
 import java.util.List;
 
 public class Column {
+
     /**
      * 이미지 URL(PNG 형식, HTTPS만 허용)<br>
      * originalContentUrl, fileId 중 하나만 지정해야 하며, 필수는 아니다.
@@ -34,7 +37,14 @@ public class Column {
      */
     private final List<Action> actions;
 
-    public Column(String originalContentUrl, String field, String title, String text, Action defaultAction, List<Action> actions) {
+    public Column(
+            String originalContentUrl,
+            String field,
+            String title,
+            String text,
+            Action defaultAction,
+            List<Action> actions
+    ) {
         this.originalContentUrl = originalContentUrl;
         this.field = field;
         this.title = title;

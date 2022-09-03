@@ -2,6 +2,8 @@ package io.jenkins.plugins.naverworks.bot.message;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jenkins.plugins.naverworks.bot.message.list.Element;
+import io.jenkins.plugins.naverworks.bot.message.list.ListTemplateContent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +27,7 @@ class ListTemplateContentTest {
         List<Map<String, String>> messages = MessageFixture.generate(1);
 
         ListTemplateContent listTemplateContent = new ListTemplateContent();
-        listTemplateContent.setMessages(messages);
+        listTemplateContent.setMessages(messages, null, null, null);
 
         // when
         List<Element> elements = listTemplateContent.getElements();

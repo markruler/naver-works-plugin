@@ -29,7 +29,7 @@
 ## Add Credentials
 
 [NAVER Works Developer Console](https://developers.worksmobile.com/kr/console/openapi/v2/app/list/view)에서
-앱 정보를 추가하고, Jenkins애서 Credential을 추가한다.
+앱 정보를 추가하고, Jenkins Credential을 추가한다.
 
 ![NAVER Works App](images/naver-works-client-app.png)
 

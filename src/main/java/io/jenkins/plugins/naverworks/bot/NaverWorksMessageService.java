@@ -5,17 +5,15 @@ import io.jenkins.plugins.naverworks.RuntimeExceptionWrapper;
 import io.jenkins.plugins.naverworks.UserConfiguration;
 import io.jenkins.plugins.naverworks.auth.NaverWorksResponseHandler;
 import io.jenkins.plugins.naverworks.auth.Token;
-import io.jenkins.plugins.naverworks.bot.message.Action;
-import io.jenkins.plugins.naverworks.bot.message.CarouselContent;
-import io.jenkins.plugins.naverworks.bot.message.CarouselMessage;
-import io.jenkins.plugins.naverworks.bot.message.CoverData;
-import io.jenkins.plugins.naverworks.bot.message.LinkContent;
-import io.jenkins.plugins.naverworks.bot.message.LinkMessage;
-import io.jenkins.plugins.naverworks.bot.message.ListTemplateContent;
-import io.jenkins.plugins.naverworks.bot.message.ListTemplateMessage;
 import io.jenkins.plugins.naverworks.bot.message.Message;
-import io.jenkins.plugins.naverworks.bot.message.TextContent;
-import io.jenkins.plugins.naverworks.bot.message.TextMessage;
+import io.jenkins.plugins.naverworks.bot.message.carousel.CarouselContent;
+import io.jenkins.plugins.naverworks.bot.message.carousel.CarouselMessage;
+import io.jenkins.plugins.naverworks.bot.message.link.LinkContent;
+import io.jenkins.plugins.naverworks.bot.message.link.LinkMessage;
+import io.jenkins.plugins.naverworks.bot.message.list.ListTemplateContent;
+import io.jenkins.plugins.naverworks.bot.message.list.ListTemplateMessage;
+import io.jenkins.plugins.naverworks.bot.message.text.TextContent;
+import io.jenkins.plugins.naverworks.bot.message.text.TextMessage;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -25,7 +23,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -33,8 +30,6 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 
 /**
  * 메시지를 Bot에 보낸다.
- *
- * @see <a href="https://developers.worksmobile.com/kr/reference/bot-channel-message-send">메시지 전송 - 채널 대상</a>
  */
 public class NaverWorksMessageService implements MessageService {
 
@@ -65,6 +60,7 @@ public class NaverWorksMessageService implements MessageService {
         final String contentActionLink = userConfiguration.getContentActionLink();
         String messageType = userConfiguration.getMessageType();
         String notification = userConfiguration.getNotification();
+
         if (isBlank(notification)) {
             notification = "Changes have been deployed.";
         }
@@ -81,10 +77,7 @@ public class NaverWorksMessageService implements MessageService {
 
             case ListTemplateContent.TYPE:
                 ListTemplateContent listTemplateContent = new ListTemplateContent();
-                listTemplateContent.setMessages(messages);
-                listTemplateContent.setCoverData(new CoverData(backgroundImageUrl));
-                Action action = new Action("uri", "more", contentActionLink);
-                listTemplateContent.setActions(Collections.singletonList(action));
+                listTemplateContent.setMessages(messages, backgroundImageUrl, contentActionLabel, contentActionLink);
                 return new ListTemplateMessage(listTemplateContent);
 
             case CarouselContent.TYPE:
