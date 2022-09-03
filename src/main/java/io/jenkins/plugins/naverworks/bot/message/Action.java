@@ -10,7 +10,7 @@ public class Action {
     /**
      * uri로 고정
      */
-    private final String type = "uri";
+    private static final String TYPE = "uri";
 
     /**
      * 항목에 표시되는 레이블
@@ -34,7 +34,7 @@ public class Action {
     }
 
     public String getType() {
-        return type;
+        return TYPE;
     }
 
     public String getLabel() {

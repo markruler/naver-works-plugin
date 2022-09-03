@@ -1,9 +1,8 @@
-package io.jenkins.plugins.naverworks.bot.message;
+package io.jenkins.plugins.naverworks.bot.message.carousel;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jenkins.plugins.naverworks.bot.message.carousel.CarouselContent;
-import io.jenkins.plugins.naverworks.bot.message.carousel.Column;
+import io.jenkins.plugins.naverworks.bot.message.MessageFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +33,7 @@ class CarouselContentTest {
 
         // then
         String actual = objectMapper.writeValueAsString(columns);
-        String expected = "[{\"originalContentUrl\":null,\"field\":null,\"title\":\"MARK-1\",\"text\":\"Jira Issue 1\",\"defaultAction\":{\"type\":\"uri\",\"label\":null,\"uri\":null},\"actions\":[{\"type\":\"uri\",\"label\":\"more\",\"uri\":\"https://markruler.github.io/\"}]}]";
+        String expected = "[{\"originalContentUrl\":null,\"field\":null,\"title\":\"MARK-1\",\"text\":\"Jira Issue 1\",\"defaultAction\":{\"label\":null,\"uri\":null,\"type\":\"uri\"},\"actions\":[{\"label\":\"more\",\"uri\":\"https://markruler.github.io/\",\"type\":\"uri\"}]}]";
         assertThat(actual).isEqualTo(expected);
     }
 
