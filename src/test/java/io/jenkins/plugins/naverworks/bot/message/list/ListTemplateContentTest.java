@@ -1,9 +1,8 @@
-package io.jenkins.plugins.naverworks.bot.message;
+package io.jenkins.plugins.naverworks.bot.message.list;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jenkins.plugins.naverworks.bot.message.list.Element;
-import io.jenkins.plugins.naverworks.bot.message.list.ListTemplateContent;
+import io.jenkins.plugins.naverworks.bot.message.MessageFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +33,7 @@ class ListTemplateContentTest {
 
         // then
         String actual = objectMapper.writeValueAsString(elements);
-        String expected = "[{\"title\":\"MARK-1\",\"subtitle\":\"Jira Issue 1\",\"action\":{\"type\":\"uri\",\"label\":\"more\",\"uri\":\"https://markruler.github.io/\"}}]";
+        String expected = "[{\"title\":\"MARK-1\",\"subtitle\":\"Jira Issue 1\",\"action\":{\"label\":\"more\",\"uri\":\"https://markruler.github.io/\",\"type\":\"uri\"}}]";
         assertThat(actual).isEqualTo(expected);
     }
 }
