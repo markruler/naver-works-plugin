@@ -26,7 +26,7 @@
         <f:entry field="contentActionLink" title="Content Action Link">
             <f:textbox placeholder="BUILD_URL (OR) https://www.jenkins.io/"/>
         </f:entry>
-        <f:entry field="notification" title="Notification">
+        <f:entry field="simpleMessage" title="Simple Message">
             <f:textbox placeholder="Changes have been deployed."/>
         </f:entry>
     </f:section>

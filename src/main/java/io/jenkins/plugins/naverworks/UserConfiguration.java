@@ -12,7 +12,7 @@ public class UserConfiguration {
     private final String backgroundImageUrl;
     private final String contentActionLabel;
     private final String contentActionLink;
-    private final String notification;
+    private final String simpleMessage;
     private final String messageType;
 
     public UserConfiguration(
@@ -20,14 +20,17 @@ public class UserConfiguration {
             String backgroundImageUrl,
             String contentActionLabel,
             String contentActionLink,
-            String notification,
+            String simpleMessage,
             String messageType
     ) {
         this.messages = messages;
         this.backgroundImageUrl = backgroundImageUrl;
         this.contentActionLabel = contentActionLabel;
         this.contentActionLink = contentActionLink;
-        this.notification = notification;
+        if (simpleMessage == null || simpleMessage.isEmpty()) {
+            simpleMessage = "Changes have been deployed.";
+        }
+        this.simpleMessage = simpleMessage;
         this.messageType = messageType;
     }
 
@@ -47,8 +50,8 @@ public class UserConfiguration {
         return contentActionLink;
     }
 
-    public String getNotification() {
-        return notification;
+    public String getSimpleMessage() {
+        return simpleMessage;
     }
 
     public String getMessageType() {

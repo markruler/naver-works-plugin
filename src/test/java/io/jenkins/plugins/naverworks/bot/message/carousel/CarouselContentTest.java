@@ -2,6 +2,7 @@ package io.jenkins.plugins.naverworks.bot.message.carousel;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jenkins.plugins.naverworks.UserConfiguration;
 import io.jenkins.plugins.naverworks.bot.message.MessageFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,9 +25,10 @@ class CarouselContentTest {
     void carousel_content_response() throws JsonProcessingException {
         // given
         List<Map<String, String>> messages = MessageFixture.generate(1);
+        UserConfiguration configuration = new UserConfiguration(messages, null, null, null, null, null);
 
         CarouselContent carouselContent = new CarouselContent();
-        carouselContent.setMessages(messages, null, null);
+        carouselContent.writeMessage(configuration);
 
         // when
         List<Column> columns = carouselContent.getColumns();

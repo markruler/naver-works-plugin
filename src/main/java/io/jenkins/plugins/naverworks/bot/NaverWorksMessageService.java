@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 
@@ -49,40 +47,29 @@ public class NaverWorksMessageService implements MessageService {
     /**
      * type별 메시지를 만든다.
      *
-     * @param userConfiguration 사용자 설정
+     * @param configuration 사용자 설정
      * @return 메시지
      */
-    private Message writeTemplateMessage(UserConfiguration userConfiguration) {
-
-        final List<Map<String, String>> messages = userConfiguration.getMessages();
-        final String backgroundImageUrl = userConfiguration.getBackgroundImageUrl();
-        final String contentActionLabel = userConfiguration.getContentActionLabel();
-        final String contentActionLink = userConfiguration.getContentActionLink();
-        String messageType = userConfiguration.getMessageType();
-        String notification = userConfiguration.getNotification();
-
-        if (isBlank(notification)) {
-            notification = "Changes have been deployed.";
-        }
-
-        switch (messageType) {
-
+    private Message writeTemplateMessage(UserConfiguration configuration) {
+        switch (configuration.getMessageType()) {
             case TextContent.TYPE:
-                TextContent textContent = new TextContent(notification);
+                TextContent textContent = new TextContent();
+                textContent.writeMessage(configuration);
                 return new TextMessage(textContent);
 
             case LinkContent.TYPE:
-                LinkContent linkContent = new LinkContent(notification, contentActionLabel, contentActionLink);
+                LinkContent linkContent = new LinkContent();
+                linkContent.writeMessage(configuration);
                 return new LinkMessage(linkContent);
 
             case ListTemplateContent.TYPE:
                 ListTemplateContent listTemplateContent = new ListTemplateContent();
-                listTemplateContent.setMessages(messages, backgroundImageUrl, contentActionLabel, contentActionLink);
+                listTemplateContent.writeMessage(configuration);
                 return new ListTemplateMessage(listTemplateContent);
 
             case CarouselContent.TYPE:
                 CarouselContent carouselContent = new CarouselContent();
-                carouselContent.setMessages(messages, backgroundImageUrl, contentActionLink);
+                carouselContent.writeMessage(configuration);
                 return new CarouselMessage(carouselContent);
 
             default:

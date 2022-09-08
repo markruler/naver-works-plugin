@@ -52,7 +52,7 @@ public class NaverWorks
     private final List<Map<String, String>> messages;
     private final String contentActionLabel;
     private final String contentActionLink;
-    private final String notification;
+    private final String simpleMessage;
     private final String messageType;
 
     @DataBoundConstructor
@@ -63,7 +63,7 @@ public class NaverWorks
             List<Map<String, String>> messages,
             String contentActionLabel,
             String contentActionLink,
-            String notification,
+            String simpleMessage,
             String messageType
     ) {
         this.credentialId = credentialId;
@@ -72,7 +72,7 @@ public class NaverWorks
         this.messages = messages;
         this.contentActionLabel = contentActionLabel;
         this.contentActionLink = contentActionLink;
-        this.notification = notification;
+        this.simpleMessage = simpleMessage;
         this.messageType = messageType;
     }
 
@@ -109,8 +109,8 @@ public class NaverWorks
         return contentActionLink;
     }
 
-    public String getNotification() {
-        return notification;
+    public String getSimpleMessage() {
+        return simpleMessage;
     }
 
     public String getMessageType() {
@@ -124,7 +124,7 @@ public class NaverWorks
                 ", messages=" + messages +
                 ", contentActionLabel='" + contentActionLabel + "'" +
                 ", contentActionLink='" + contentActionLink + "'" +
-                ", notification='" + notification + "'" +
+                ", simpleMessage='" + simpleMessage + "'" +
                 ", messageType='" + messageType + "'" +
                 '}';
     }
@@ -169,7 +169,7 @@ public class NaverWorks
                         backgroundImageUrl,
                         contentActionLabel,
                         actionLink,
-                        notification,
+                        simpleMessage,
                         messageType);
         final Message message = messageService.write(userConfiguration);
 

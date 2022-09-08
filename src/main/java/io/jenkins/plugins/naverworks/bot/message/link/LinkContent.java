@@ -1,5 +1,6 @@
 package io.jenkins.plugins.naverworks.bot.message.link;
 
+import io.jenkins.plugins.naverworks.UserConfiguration;
 import io.jenkins.plugins.naverworks.bot.message.Content;
 
 /**
@@ -17,23 +18,17 @@ public class LinkContent implements Content {
     /**
      * 메시지 본문
      */
-    private final String contentText;
+    private String contentText;
 
     /**
      * 링크 레이블
      */
-    private final String linkText;
+    private String linkText;
 
     /**
      * linkText 영역을 누르면 이동할 페이지
      */
-    private final String link;
-
-    public LinkContent(String contentText, String linkText, String link) {
-        this.contentText = contentText;
-        this.linkText = linkText;
-        this.link = link;
-    }
+    private String link;
 
     @Override
     public String getType() {
@@ -50,5 +45,12 @@ public class LinkContent implements Content {
 
     public String getLink() {
         return link;
+    }
+
+    @Override
+    public void writeMessage(UserConfiguration configuration) {
+        this.contentText = configuration.getSimpleMessage();
+        this.linkText = configuration.getContentActionLabel();
+        this.link = configuration.getContentActionLink();
     }
 }

@@ -33,8 +33,8 @@ class NaverWorksMessageServiceTest {
     class Describe_TextMessage {
 
         @Nested
-        @DisplayName("notification이 비어 있다면")
-        class Context_notification_is_empty {
+        @DisplayName("simpleMessage가 비어 있다면")
+        class Context_simpleMessage_is_empty {
 
             @ParameterizedTest
             @ValueSource(strings = TextContent.TYPE)
@@ -46,7 +46,7 @@ class NaverWorksMessageServiceTest {
                 String backgroundImageUrl = null;
                 String contentActionLabel = null;
                 String contentActionLink = null;
-                String notification = null;
+                String simpleMessage = null;
 
                 UserConfiguration userConfiguration =
                         new UserConfiguration(
@@ -54,7 +54,7 @@ class NaverWorksMessageServiceTest {
                                 backgroundImageUrl,
                                 contentActionLabel,
                                 contentActionLink,
-                                notification,
+                                simpleMessage,
                                 messageType
                         );
                 Message message = service.write(userConfiguration);
@@ -66,20 +66,20 @@ class NaverWorksMessageServiceTest {
         }
 
         @Nested
-        @DisplayName("notification이 있다면")
-        class Context_notification_is_not_empty {
+        @DisplayName("simpleMessage가 있다면")
+        class Context_simpleMessage_is_not_empty {
 
             @ParameterizedTest
             @ValueSource(strings = TextContent.TYPE)
-            @DisplayName("notifiaction을 출력한다")
-            void if_text_message_has_notification_sut_returns_notification(String messageType) {
+            @DisplayName("simpleMessage을 출력한다")
+            void if_text_message_has_simpleMessage_sut_returns_simpleMessage(String messageType) {
 
                 int size = 0;
                 List<Map<String, String>> messages = MessageFixture.generate(size);
                 String backgroundImageUrl = null;
                 String contentActionLabel = null;
                 String contentActionLink = null;
-                String notification = "Notify";
+                String simpleMessage = "Notify";
 
                 UserConfiguration userConfiguration =
                         new UserConfiguration(
@@ -87,14 +87,14 @@ class NaverWorksMessageServiceTest {
                                 backgroundImageUrl,
                                 contentActionLabel,
                                 contentActionLink,
-                                notification,
+                                simpleMessage,
                                 messageType
                         );
                 Message message = service.write(userConfiguration);
 
                 Content content = message.getContent();
                 assertThat(content).isInstanceOf(TextContent.class);
-                assertThat(((TextContent) content).getText()).isEqualTo(notification);
+                assertThat(((TextContent) content).getText()).isEqualTo(simpleMessage);
             }
         }
 
@@ -106,12 +106,12 @@ class NaverWorksMessageServiceTest {
     class Describe_LinkMessage {
 
         @Nested
-        @DisplayName("notification이 있다면")
-        class Context_notification_is_not_empty {
+        @DisplayName("simpleMessage가 있다면")
+        class Context_simpleMessage_is_not_empty {
 
             @ParameterizedTest
             @ValueSource(strings = LinkContent.TYPE)
-            @DisplayName("notification을 출력한다")
+            @DisplayName("simpleMessage을 출력한다")
             void message_type_link(String messageType) {
 
                 int size = 0;
@@ -119,7 +119,7 @@ class NaverWorksMessageServiceTest {
                 String backgroundImageUrl = null;
                 String contentActionLabel = "Go to Jenkins";
                 String contentActionLink = "https://www.jenkins.io/";
-                String notification = "Notify";
+                String simpleMessage = "Notify";
 
                 UserConfiguration userConfiguration =
                         new UserConfiguration(
@@ -127,14 +127,14 @@ class NaverWorksMessageServiceTest {
                                 backgroundImageUrl,
                                 contentActionLabel,
                                 contentActionLink,
-                                notification,
+                                simpleMessage,
                                 messageType
                         );
                 Message message = service.write(userConfiguration);
 
                 Content content = message.getContent();
                 assertThat(content).isInstanceOf(LinkContent.class);
-                assertThat(((LinkContent) content).getContentText()).isEqualTo(notification);
+                assertThat(((LinkContent) content).getContentText()).isEqualTo(simpleMessage);
             }
         }
 
@@ -154,7 +154,7 @@ class NaverWorksMessageServiceTest {
             String backgroundImageUrl = null;
             String contentActionLabel = null;
             String contentActionLink = null;
-            String notification = null;
+            String simpleMessage = null;
 
             UserConfiguration userConfiguration =
                     new UserConfiguration(
@@ -162,7 +162,7 @@ class NaverWorksMessageServiceTest {
                             backgroundImageUrl,
                             contentActionLabel,
                             contentActionLink,
-                            notification,
+                            simpleMessage,
                             messageType
                     );
             Message message = service.write(userConfiguration);
@@ -185,7 +185,7 @@ class NaverWorksMessageServiceTest {
             String backgroundImageUrl = null;
             String contentActionLabel = null;
             String contentActionLink = null;
-            String notification = null;
+            String simpleMessage = null;
 
             UserConfiguration userConfiguration =
                     new UserConfiguration(
@@ -193,7 +193,7 @@ class NaverWorksMessageServiceTest {
                             backgroundImageUrl,
                             contentActionLabel,
                             contentActionLink,
-                            notification,
+                            simpleMessage,
                             messageType
                     );
             Message message = service.write(userConfiguration);

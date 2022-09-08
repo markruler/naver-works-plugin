@@ -56,10 +56,10 @@ stage('Notification') {
             contentActionLabel: 'Go to Jenkins',
             contentActionLink: env.BUILD_URL,
             messages: issues,
-            notification: """${minute}분 뒤 'A'가 재시작됩니다.
-                          |
-                          |'A' will restart in ${minute} minutes.
-                          |""".stripMargin()
+            simpleMessage: """${minute}분 뒤 'A'가 재시작됩니다.
+                           |
+                           |'A' will restart in ${minute} minutes.
+                           |""".stripMargin()
     )
 }
 ```
@@ -85,10 +85,10 @@ naver(
         channelId: env.NAVER_WORKS_CHANNEL_ID,
         messageType: 'text',
         // optional parameters
-        notification: """${minute}분 뒤 'A'가 재시작됩니다.
-                      |
-                      |'A' will restart in ${minute} minutes.
-                      |""".stripMargin()
+        simpleMessage: """${minute}분 뒤 'A'가 재시작됩니다.
+                       |
+                       |'A' will restart in ${minute} minutes.
+                       |""".stripMargin()
 )
 ```
 
@@ -107,7 +107,7 @@ naver(
         backgroundImageUrl: env.NAVER_WORKS_BG_URL,
         contentActionLabel: 'Go to Jenkins',
         contentActionLink: env.BUILD_URL,
-        notification: 'Changes have been deployed.'
+        simpleMessage: 'Changes have been deployed.'
 )
 ```
 

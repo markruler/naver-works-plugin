@@ -1,5 +1,6 @@
 package io.jenkins.plugins.naverworks.bot.message.text;
 
+import io.jenkins.plugins.naverworks.UserConfiguration;
 import io.jenkins.plugins.naverworks.bot.message.Content;
 
 public class TextContent implements Content {
@@ -12,11 +13,7 @@ public class TextContent implements Content {
     /**
      * 메시지 본문
      */
-    private final String text;
-
-    public TextContent(String text) {
-        this.text = text;
-    }
+    private String text;
 
     @Override
     public String getType() {
@@ -25,5 +22,10 @@ public class TextContent implements Content {
 
     public String getText() {
         return text;
+    }
+
+    @Override
+    public void writeMessage(UserConfiguration configuration) {
+        this.text = configuration.getSimpleMessage();
     }
 }

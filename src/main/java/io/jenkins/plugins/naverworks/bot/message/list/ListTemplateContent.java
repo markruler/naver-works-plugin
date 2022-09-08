@@ -1,5 +1,6 @@
 package io.jenkins.plugins.naverworks.bot.message.list;
 
+import io.jenkins.plugins.naverworks.UserConfiguration;
 import io.jenkins.plugins.naverworks.bot.message.Action;
 import io.jenkins.plugins.naverworks.bot.message.Content;
 import org.apache.commons.collections.MapUtils;
@@ -39,17 +40,37 @@ public class ListTemplateContent implements Content {
      */
     private List<List<Action>> actions;
 
-    /**
-     * List Template 메시지를 생성한다.
-     *
-     * @param messages 메시지 내용
-     */
-    public void setMessages(
-            List<Map<String, String>> messages,
-            String backgroundImageUrl,
-            String contentActionLabel,
-            String contentActionLink
-    ) {
+    @Override
+    public String getType() {
+        return TYPE;
+    }
+
+    public CoverData getCoverData() {
+        return coverData;
+    }
+
+    public List<Element> getElements() {
+        return elements;
+    }
+
+    public List<List<Action>> getActions() {
+        return actions;
+    }
+
+    public void setActions(List<Action> actions) {
+        List<List<Action>> contentActions = new ArrayList<>();
+        contentActions.add(actions);
+
+        this.actions = contentActions;
+    }
+
+    @Override
+    public void writeMessage(UserConfiguration configuration) {
+        final String backgroundImageUrl = configuration.getBackgroundImageUrl();
+        String contentActionLabel = configuration.getContentActionLabel();
+        final String contentActionLink = configuration.getContentActionLink();
+        final List<Map<String, String>> messages = configuration.getMessages();
+
         this.coverData = new CoverData(backgroundImageUrl);
 
         if (isBlank(contentActionLabel)) {
@@ -77,29 +98,5 @@ public class ListTemplateContent implements Content {
             elementCount++;
         }
         this.elements = elementList;
-    }
-
-    @Override
-    public String getType() {
-        return TYPE;
-    }
-
-    public CoverData getCoverData() {
-        return coverData;
-    }
-
-    public List<Element> getElements() {
-        return elements;
-    }
-
-    public List<List<Action>> getActions() {
-        return actions;
-    }
-
-    public void setActions(List<Action> actions) {
-        List<List<Action>> contentActions = new ArrayList<>();
-        contentActions.add(actions);
-
-        this.actions = contentActions;
     }
 }
