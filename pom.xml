@@ -8,7 +8,8 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.47</version>
+        <!-- https://mvnrepository.com/artifact/org.jenkins-ci.plugins/plugin -->
+        <version>4.87</version>
         <relativePath/>
     </parent>
 
@@ -43,20 +44,22 @@
 
     <properties>
         <!-- https://www.jenkins.io/doc/developer/publishing/releasing-cd/ -->
-        <revision>1.0.0</revision>
+        <revision>1.0.1</revision>
         <changelist>-SNAPSHOT</changelist>
         <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
-        <jenkins.version>2.332.4</jenkins.version>
+        <!-- https://mvnrepository.com/artifact/org.jenkins-ci.main/jenkins-war -->
+        <jenkins.version>2.462.1</jenkins.version>
         <gitHubRepo>markruler/${project.artifactId}-plugin</gitHubRepo>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- https://www.jenkins.io/doc/developer/tutorial-improve/update-base-jenkins-version/#update-minimum-required-jenkins-version -->
+            <!-- Pick up common dependencies for the selected LTS line: https://github.com/jenkinsci/bom#usage -->
             <dependency>
-                <!-- Pick up common dependencies for the selected LTS line: https://github.com/jenkinsci/bom#usage -->
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.332.x</artifactId>
-                <version>1595.v8c71c13cc3a_9</version>
+                <artifactId>bom-2.462.x</artifactId>
+                <version>3307.v2769886db_63b_</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -124,7 +127,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.13.3</version>
+            <version>2.17.2</version>
         </dependency>
 
     </dependencies>
@@ -159,7 +162,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>9.3</version>
+                        <version>10.18.1</version>
                     </dependency>
                 </dependencies>
                 <executions>

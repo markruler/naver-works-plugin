@@ -2,9 +2,13 @@
 
 ## Prerequisite
 
-- Java 1.8+
+- Java 17+
 
 ## Test running
+
+```shell
+./mvnw clean verify
+```
 
 ````shell
 ./mvnw clean hpi:run
