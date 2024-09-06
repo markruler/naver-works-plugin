@@ -4,18 +4,40 @@
 
 - Java 17+
 
-## Test running
+## Verify
 
 ```shell
 ./mvnw clean verify
 ```
+
+## Running
 
 ````shell
 ./mvnw clean hpi:run
 # Jenkins is fully up and running
 ````
 
-- Access to http://localhost:8080/jenkins/
+- [http://localhost:8080/jenkins/](http://localhost:8080/jenkins/) 접속
+- Pipeline 문법을 사용하려면 필요한 [Pipeline 플러그인](https://plugins.jenkins.io/workflow-aggregator/) 설치
+
+```groovy
+node {
+    stage('Notification') {
+        naver(
+                // required parameters
+                credentialId: 'naver-works-credential',
+                botId: env.NAVER_WORKS_BOT_ID,
+                channelId: env.NAVER_WORKS_CHANNEL_ID,
+                messageType: 'text',
+                // optional parameters
+                backgroundImageUrl: env.NAVER_WORKS_BG_URL,
+                contentActionLabel: 'Go to Jenkins',
+                contentActionLink: env.BUILD_URL,
+                simpleMessage: """test""".stripMargin()
+        )
+    }
+}
+```
 
 ## Build
 
@@ -43,28 +65,30 @@
 
 ```groovy
 // Jenkinsfile.groovy
-stage('Notification') {
-    List issues = [
-            [link: "https://jira.markruler.com/browse/MARK-31", title: "MARK-31", subtitle: "Jira Issue 31"],
-            [link: "https://jira.markruler.com/browse/MARK-32", title: "MARK-32", subtitle: "Jira Issue 32"]
-    ]
+node {
+    stage('Notification') {
+        List issues = [
+                [link: "https://jira.markruler.com/browse/MARK-31", title: "MARK-31", subtitle: "Jira Issue 31"],
+                [link: "https://jira.markruler.com/browse/MARK-32", title: "MARK-32", subtitle: "Jira Issue 32"]
+        ]
 
-    naver(
-            // required parameters
-            credentialId: 'naver-works-credential',
-            botId: env.NAVER_WORKS_BOT_ID,
-            channelId: env.NAVER_WORKS_CHANNEL_ID,
-            messageType: 'list_template',
-            // optional parameters
-            backgroundImageUrl: env.NAVER_WORKS_BG_URL,
-            contentActionLabel: 'Go to Jenkins',
-            contentActionLink: env.BUILD_URL,
-            messages: issues,
-            simpleMessage: """${minute}분 뒤 'A'가 재시작됩니다.
-                           |
-                           |'A' will restart in ${minute} minutes.
-                           |""".stripMargin()
-    )
+        naver(
+                // required parameters
+                credentialId: 'naver-works-credential',
+                botId: env.NAVER_WORKS_BOT_ID,
+                channelId: env.NAVER_WORKS_CHANNEL_ID,
+                messageType: 'list_template',
+                // optional parameters
+                backgroundImageUrl: env.NAVER_WORKS_BG_URL,
+                contentActionLabel: 'Go to Jenkins',
+                contentActionLink: env.BUILD_URL,
+                messages: issues,
+                simpleMessage: """${minute}분 뒤 'A'가 재시작됩니다.
+                               |
+                               |'A' will restart in ${minute} minutes.
+                               |""".stripMargin()
+        )
+    }
 }
 ```
 
@@ -82,18 +106,22 @@ stage('Notification') {
 ### Text
 
 ```groovy
-naver(
-        // required parameters
-        credentialId: 'naver-works-credential',
-        botId: env.NAVER_WORKS_BOT_ID,
-        channelId: env.NAVER_WORKS_CHANNEL_ID,
-        messageType: 'text',
-        // optional parameters
-        simpleMessage: """${minute}분 뒤 'A'가 재시작됩니다.
-                       |
-                       |'A' will restart in ${minute} minutes.
-                       |""".stripMargin()
-)
+node {
+    stage('Notification') {
+        naver(
+                // required parameters
+                credentialId: 'naver-works-credential',
+                botId: env.NAVER_WORKS_BOT_ID,
+                channelId: env.NAVER_WORKS_CHANNEL_ID,
+                messageType: 'text',
+                // optional parameters
+                simpleMessage: """${minute}분 뒤 'A'가 재시작됩니다.
+                               |
+                               |'A' will restart in ${minute} minutes.
+                               |""".stripMargin()
+        )
+    }
+}
 ```
 
 ![Text](images/text-content.png)
@@ -101,18 +129,22 @@ naver(
 ### Link
 
 ```groovy
-naver(
-        // required parameters
-        credentialId: 'naver-works-credential',
-        botId: env.NAVER_WORKS_BOT_ID,
-        channelId: env.NAVER_WORKS_CHANNEL_ID,
-        messageType: 'link',
-        // optional parameters
-        backgroundImageUrl: env.NAVER_WORKS_BG_URL,
-        contentActionLabel: 'Go to Jenkins',
-        contentActionLink: env.BUILD_URL,
-        simpleMessage: 'Changes have been deployed.'
-)
+node {
+    stage('Notification') {
+        naver(
+                // required parameters
+                credentialId: 'naver-works-credential',
+                botId: env.NAVER_WORKS_BOT_ID,
+                channelId: env.NAVER_WORKS_CHANNEL_ID,
+                messageType: 'link',
+                // optional parameters
+                backgroundImageUrl: env.NAVER_WORKS_BG_URL,
+                contentActionLabel: 'Go to Jenkins',
+                contentActionLink: env.BUILD_URL,
+                simpleMessage: 'Changes have been deployed.'
+        )
+    }
+}
 ```
 
 ![Link](images/link-content.png)
@@ -120,23 +152,27 @@ naver(
 ### List Template
 
 ```groovy
-List issues = [
-        [link: "https://jira.markruler.com/browse/MARK-31", title: "MARK-31", subtitle: "Jira Issue 31"],
-        [link: "https://jira.markruler.com/browse/MARK-32", title: "MARK-32", subtitle: "Jira Issue 32"]
-]
+node {
+    stage('Notification') {
+        List issues = [
+                [link: "https://jira.markruler.com/browse/MARK-31", title: "MARK-31", subtitle: "Jira Issue 31"],
+                [link: "https://jira.markruler.com/browse/MARK-32", title: "MARK-32", subtitle: "Jira Issue 32"]
+        ]
 
-naver(
-        // required parameters
-        credentialId: 'naver-works-credential',
-        botId: env.NAVER_WORKS_BOT_ID,
-        channelId: env.NAVER_WORKS_CHANNEL_ID,
-        messageType: 'list_template',
-        // optional parameters
-        backgroundImageUrl: env.NAVER_WORKS_BG_URL,
-        contentActionLabel: 'Go to Jenkins',
-        contentActionLink: env.BUILD_URL,
-        messages: issues
-)
+        naver(
+                // required parameters
+                credentialId: 'naver-works-credential',
+                botId: env.NAVER_WORKS_BOT_ID,
+                channelId: env.NAVER_WORKS_CHANNEL_ID,
+                messageType: 'list_template',
+                // optional parameters
+                backgroundImageUrl: env.NAVER_WORKS_BG_URL,
+                contentActionLabel: 'Go to Jenkins',
+                contentActionLink: env.BUILD_URL,
+                messages: issues
+        )
+    }
+}
 ```
 
 ![List Template](images/list-template-content.png)
@@ -144,24 +180,28 @@ naver(
 ### Carousel
 
 ```groovy
-List issues = [
-        [link: "https://jira.markruler.com/browse/MARK-1", title: "MARK-1", subtitle: "not null"],
-        [link: "https://jira.markruler.com/browse/MARK-2", title: "MARK-2", subtitle: "subtitle2"],
-        [link: "https://www.jenkins.io/", title: "title-3", subtitle: "subtitle3"]
-]
+node {
+    stage('Notification') {
+        List issues = [
+                [link: "https://jira.markruler.com/browse/MARK-1", title: "MARK-1", subtitle: "not null"],
+                [link: "https://jira.markruler.com/browse/MARK-2", title: "MARK-2", subtitle: "subtitle2"],
+                [link: "https://www.jenkins.io/", title: "title-3", subtitle: "subtitle3"]
+        ]
 
-naver(
-        // required parameters
-        credentialId: 'naver-works-credential',
-        botId: env.NAVER_WORKS_BOT_ID,
-        channelId: env.NAVER_WORKS_CHANNEL_ID,
-        messageType: 'carousel',
-        // optional parameters
-        backgroundImageUrl: env.NAVER_WORKS_BG_URL,
-        contentActionLabel: 'Go to Jenkins',
-        contentActionLink: env.BUILD_URL,
-        messages: issues
-)
+        naver(
+                // required parameters
+                credentialId: 'naver-works-credential',
+                botId: env.NAVER_WORKS_BOT_ID,
+                channelId: env.NAVER_WORKS_CHANNEL_ID,
+                messageType: 'carousel',
+                // optional parameters
+                backgroundImageUrl: env.NAVER_WORKS_BG_URL,
+                contentActionLabel: 'Go to Jenkins',
+                contentActionLink: env.BUILD_URL,
+                messages: issues
+        )
+    }
+}
 ```
 
 ![Carousel](images/carousel-content.png)

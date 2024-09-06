@@ -22,7 +22,6 @@ import java.security.GeneralSecurityException;
 import java.security.interfaces.RSAPrivateKey;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,8 +32,6 @@ import java.util.logging.Logger;
 
 /**
  * NAVER Works 인증 요청
- *
- * @see <a href="https://developers.worksmobile.com/kr/reference/authorization-sa">서비스 계정으로 인증(JWT)</a>
  */
 public class NaverWorksAuth {
 
@@ -43,9 +40,10 @@ public class NaverWorksAuth {
     public static final String AUTH_API = "https://auth.worksmobile.com/oauth2/v2.0/token";
 
     /**
-     * 서비스 계정으로 인증 토큰을 요청한다.
+     * 서비스 계정(SA, Service Account)으로 인증 토큰을 요청한다.
      *
      * @return NAVER Works Token
+     * @see <a href="https://developers.worksmobile.com/docs/auth-jwt">서비스 계정으로 인증(JWT)</a>
      */
     public Token requestNaverWorksToken(final NaverWorksCredential credential) {
 
@@ -56,7 +54,7 @@ public class NaverWorksAuth {
 
             final long expired = token.getExpired();
             final long now = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+9"));
-            if (expired >= now) {
+            if (expired > now) {
                 LOG.log(Level.INFO, "Stored token is not expired.");
                 return token;
             }
@@ -71,17 +69,19 @@ public class NaverWorksAuth {
     }
 
     /**
-     * 새로운 토큰을 발급 받아서 저장한다.
+     * 새로운 인증 토큰을 발급 받아서 Credential에 저장한다.
      *
      * @param credential NAVER Works Credential
-     * @return 새로운 토큰
+     * @return 새로운 인증 토큰
      */
     private Token saveNewToken(NaverWorksCredential credential)
             throws GeneralSecurityException, IOException, URISyntaxException {
 
+        // 토큰 발급
         Token token = requestNewToken(credential);
-        credential.setToken(token);
 
+        // Credential 저장
+        credential.setToken(token);
         SystemCredentialsProvider provider = SystemCredentialsProvider.getInstance();
         provider.save();
 
@@ -89,7 +89,7 @@ public class NaverWorksAuth {
     }
 
     /**
-     * 새로운 토큰 발급을 요청한다.
+     * 새로운 인증 토큰을 발급하기 위해 NAVER Works에 인증을 요청한다.
      *
      * @param credential NAVER Works Credential
      * @return 인증 토큰
@@ -118,7 +118,8 @@ public class NaverWorksAuth {
             String httpResponse = httpClient.execute(httpRequest, new NaverWorksResponseHandler());
             final ObjectMapper objectMapper = new ObjectMapper();
             Token token = objectMapper.readValue(httpResponse, Token.class);
-            LocalDateTime expired = LocalDateTime.now().plus(1, ChronoUnit.HOURS);
+            // TODO: 보안을 위해 1시간으로 제한했지만, 파라미터로 받는 것이 좋을 듯함.
+            LocalDateTime expired = LocalDateTime.now().plusHours(1);
             token.setExpired(expired.toEpochSecond(ZoneOffset.of("+9")));
 
             return token;
@@ -131,6 +132,7 @@ public class NaverWorksAuth {
      * @param credential NAVER Works Credential
      * @return JWT
      * @throws GeneralSecurityException
+     * @see <a href="https://developers.worksmobile.com/kr/docs/auth-jwt#generate-jwt">JWT 생성</a>
      */
     public String generateJwtWithServiceAccount(NaverWorksCredential credential)
             throws GeneralSecurityException {

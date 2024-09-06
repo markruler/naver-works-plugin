@@ -17,6 +17,9 @@ public class NaverWorksCredential extends BasicSSHUserPrivateKey {
 
     private static final long serialVersionUID = 11L;
 
+    /**
+     * 인증 토큰을 파이프라인 실행 중에 API로 요청해서 저장한다.
+     */
     private Token token;
     private final Secret clientId;
     private final Secret clientSecret;
