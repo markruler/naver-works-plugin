@@ -12,7 +12,7 @@ jobs:
         java: [ 17, 21 ]
     # https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build
         uses: actions/setup-java@v3
         with:
